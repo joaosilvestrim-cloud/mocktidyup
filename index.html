@@ -1,0 +1,1799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>TidyUp! ERP — Operating Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  /* brand — from the official TidyUp! logo */
+  --navy:#01475D; --navy-2:#013a4d; --navy-3:#00222f;
+  --cyan:#02CDFF; --cyan-ink:#0b8fb4; --cyan-soft:#e6f9ff;
+  /* ink & neutrals — cool, with a slight teal bias so grey never reads dead */
+  --ink:#0d2734; --title:#0d2734; --text:#41535d; --muted:#6f838d; --faint:#9fb1b9;
+  --line:#e4edf1; --soft:#f5fafb; --soft-2:#e9f2f5; --soft-line:#e7eff3; --card:#ffffff;
+  --bg:#e9f1f4;
+  /* category accents */
+  --blue:#2f6fed; --teal:#0fb2a4; --green:#1a9d61; --amber:#e6a015;
+  --orange:#ee7a1a; --purple:#7a44e0; --red:#ef4553;
+  --ok:#1a9d61; --warn:#e6a015; --bad:#ef4553;
+  /* elevation — cooler, layered */
+  --shadow:0 1px 2px rgba(3,45,58,.05), 0 8px 22px -14px rgba(3,45,58,.20);
+  --shadow-md:0 2px 6px rgba(3,45,58,.06), 0 22px 44px -22px rgba(3,45,58,.28);
+  --shadow-lg:0 10px 24px -12px rgba(3,45,58,.18), 0 42px 72px -30px rgba(3,45,58,.42);
+  --grad:linear-gradient(120deg,var(--navy),#0a7f9f 55%,var(--cyan));
+  --radius:14px; --radius-sm:9px; --radius-lg:18px;
+}
+*{box-sizing:border-box; margin:0; padding:0}
+html,body{height:100%}
+body{font-family:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--text); background:var(--bg); -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; font-size:13.5px; line-height:1.5; letter-spacing:-.005em; font-feature-settings:"cv05","ss01"}
+h1,h2,h3,h4{font-family:"Sora",system-ui,sans-serif; color:var(--ink); line-height:1.14; letter-spacing:-.022em; text-wrap:balance}
+.mono{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,monospace; font-feature-settings:"tnum"}
+/* numbers line up */
+.kval,.num,.hv,.mini b,.kpi .kval,td.num{font-variant-numeric:tabular-nums}
+:focus-visible{outline:2px solid var(--cyan); outline-offset:2px; border-radius:4px}
+::selection{background:rgba(2,205,255,.24)}
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:#c6d6dd;border-radius:8px;border:2px solid transparent;background-clip:content-box}::-webkit-scrollbar-thumb:hover{background:#aebfc8}
+
+/* ============ STAGE CONTROL ============ */
+#login,#hub{display:none}
+body.stage-login #login{display:flex}
+body.stage-hub #hub{display:block}
+body.stage-app .app{display:grid}
+
+/* ============ APP SHELL ============ */
+.app{display:none; grid-template-columns:246px 1fr; height:100vh; overflow:hidden}
+
+/* ---- SIDEBAR ---- */
+.side{background:linear-gradient(185deg,var(--navy-2),var(--navy-3)); color:#bcd4de; display:flex; flex-direction:column; overflow:hidden}
+.side-top{padding:18px 18px 14px; display:flex; align-items:center; gap:11px; border-bottom:1px solid rgba(255,255,255,.07)}
+.logo-mark{width:36px; height:36px; border-radius:10px; background:linear-gradient(150deg,var(--cyan),#0a86a8); display:grid; place-items:center; box-shadow:0 8px 18px -8px rgba(2,205,255,.6)}
+.logo-mark svg{width:20px; height:20px; stroke:#02303e; fill:none; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round}
+.logo-txt{font-family:"Sora"; font-weight:800; font-size:16px; color:#fff; letter-spacing:-.02em}
+.logo-txt b{color:var(--cyan)}
+.logo-sub{font-family:"JetBrains Mono"; font-size:8.5px; letter-spacing:.24em; color:#5f93a8; margin-top:1px}
+
+.side-scroll{flex:1; overflow-y:auto; padding:10px 10px 8px}
+.nav-group{margin-top:12px}
+.nav-group:first-child{margin-top:2px}
+.nav-label{font-family:"JetBrains Mono"; font-size:8.5px; letter-spacing:.24em; text-transform:uppercase; color:#537b8d; padding:6px 10px 5px}
+.nav-item{display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:8px; cursor:pointer; color:#a9c6d2; font-size:12.8px; font-weight:500; transition:.13s; position:relative}
+.nav-item svg{width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; flex:0 0 auto}
+.nav-item:hover{background:rgba(255,255,255,.05); color:#eaf5f9}
+.nav-item.active{background:linear-gradient(90deg,rgba(2,205,255,.16),rgba(2,205,255,.03)); color:#fff}
+.nav-item.active::before{content:""; position:absolute; left:0; top:6px; bottom:6px; width:3px; border-radius:3px; background:var(--cyan)}
+.nav-item .tag{margin-left:auto; font-size:9px; font-family:"JetBrains Mono"; background:var(--red); color:#fff; border-radius:20px; padding:1px 6px; font-weight:600}
+.nav-item .tag.soft{background:rgba(255,255,255,.12); color:#bcd4de}
+
+.side-foot{padding:12px; border-top:1px solid rgba(255,255,255,.07)}
+.user{display:flex; align-items:center; gap:10px; padding:8px; border-radius:9px; background:rgba(255,255,255,.04)}
+.avatar{width:32px; height:32px; border-radius:50%; background:linear-gradient(150deg,#12b5a6,#0a86a8); display:grid; place-items:center; color:#fff; font-weight:700; font-size:12px; flex:0 0 auto}
+.user-meta{min-width:0}
+.user-meta b{color:#fff; font-size:12.5px; font-weight:600; display:block; font-family:"Sora"}
+.user-meta span{font-size:10.5px; color:#6f9aab}
+
+/* ---- MAIN ---- */
+.main{display:flex; flex-direction:column; overflow:hidden}
+.topbar{height:58px; background:rgba(255,255,255,.92); backdrop-filter:saturate(180%) blur(10px); border-bottom:1px solid var(--line); display:flex; align-items:center; gap:14px; padding:0 22px; flex:0 0 auto}
+.tb-title{font-family:"Sora"; font-weight:700; font-size:16px; color:var(--ink)}
+.tb-crumb{font-size:11px; color:var(--muted); font-family:"JetBrains Mono"; letter-spacing:.04em}
+.search{margin-left:14px; flex:1; max-width:360px; position:relative}
+.search input{width:100%; padding:8px 12px 8px 32px; border:1px solid var(--line); background:var(--soft); border-radius:9px; font-size:12.5px; font-family:"Inter"; color:var(--text)}
+.search input:focus{outline:none; border-color:var(--cyan); background:#fff}
+.search svg{position:absolute; left:10px; top:9px; width:14px; height:14px; stroke:var(--faint); fill:none; stroke-width:2}
+.tb-right{margin-left:auto; display:flex; align-items:center; gap:10px}
+.wspill{display:flex; align-items:center; gap:7px; font-size:11.5px; font-weight:600; color:var(--navy); background:#e5f9ff; border:1px solid #c3eefb; padding:6px 11px; border-radius:8px}
+.wspill .dot{width:7px; height:7px; border-radius:50%; background:var(--ok)}
+.icon-btn{width:34px; height:34px; border-radius:9px; border:1px solid var(--line); background:var(--soft); display:grid; place-items:center; cursor:pointer; position:relative}
+.icon-btn svg{width:16px; height:16px; stroke:var(--muted); fill:none; stroke-width:1.8}
+.icon-btn .badge{position:absolute; top:-4px; right:-4px; min-width:15px; height:15px; border-radius:20px; background:var(--red); color:#fff; font-size:9px; font-weight:700; display:grid; place-items:center; padding:0 3px; border:2px solid #fff}
+
+.canvas{flex:1; overflow-y:auto; padding:22px 24px 40px}
+.view{display:none; animation:fade .25s ease}
+.view.active{display:block}
+@keyframes fade{from{opacity:0; transform:translateY(6px)}to{opacity:1; transform:none}}
+
+/* ---- generic pieces ---- */
+.page-head{display:flex; align-items:flex-end; justify-content:space-between; gap:16px; margin-bottom:18px; flex-wrap:wrap}
+.page-head h2{font-size:22px; font-weight:700}
+.page-head p{font-size:13px; color:var(--muted); margin-top:3px}
+.head-actions{display:flex; gap:8px}
+.btn{display:inline-flex; align-items:center; gap:7px; padding:8px 14px; border-radius:9px; font-size:12.5px; font-weight:600; cursor:pointer; border:1px solid var(--line); background:#fff; color:var(--text); font-family:"Inter"; transition:.14s}
+.btn svg{width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:2}
+.btn:hover{border-color:var(--cyan)}
+.btn.primary{background:linear-gradient(150deg,var(--navy),#0a6d8c); color:#fff; border:none; box-shadow:0 10px 22px -12px rgba(1,71,93,.7)}
+.btn.primary:hover{transform:translateY(-1px)}
+
+.grid{display:grid; gap:16px}
+.g4{grid-template-columns:repeat(4,1fr)} .g3{grid-template-columns:repeat(3,1fr)} .g2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:1180px){.g4{grid-template-columns:repeat(2,1fr)} .g3{grid-template-columns:1fr}}
+.card{background:var(--card); border:1px solid var(--soft-line); border-radius:var(--radius); box-shadow:var(--shadow)}
+.card-pad{padding:16px 18px}
+.card-head{display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid var(--soft-line)}
+.card-head h3{font-size:13.5px; font-weight:700}
+.card-head .sub{font-size:11px; color:var(--muted)}
+.link{font-size:11.5px; color:var(--cyan-ink); font-weight:600; cursor:pointer}
+
+/* KPI */
+.kpi{background:var(--card); border:1px solid var(--soft-line); border-radius:var(--radius); padding:15px 16px; box-shadow:var(--shadow); position:relative; overflow:hidden}
+.kpi .kico{width:34px; height:34px; border-radius:9px; display:grid; place-items:center; margin-bottom:10px}
+.kpi .kico svg{width:17px; height:17px; stroke:#fff; fill:none; stroke-width:2}
+.kpi .klabel{font-size:11px; color:var(--muted); font-weight:500; text-transform:uppercase; letter-spacing:.04em}
+.kpi .kval{font-family:"Sora"; font-size:25px; font-weight:700; color:var(--ink); margin-top:2px; letter-spacing:-.02em}
+.kpi .kdelta{font-size:11.5px; font-weight:600; margin-top:5px; display:inline-flex; align-items:center; gap:4px}
+.kdelta.up{color:var(--ok)} .kdelta.down{color:var(--bad)} .kdelta.flat{color:var(--muted)}
+
+/* badges */
+.badge{display:inline-flex; align-items:center; gap:5px; font-size:10.5px; font-weight:600; padding:3px 8px; border-radius:20px; white-space:nowrap; font-family:"Inter"}
+.b-green{color:#0f7a45; background:#e6f6ec; border:1px solid #cbebd3}
+.b-blue{color:#0663a8; background:#e8f3fc; border:1px solid #cfe6f8}
+.b-amber{color:#8a5a06; background:#fcf2df; border:1px solid #f3e3bd}
+.b-red{color:#a81f2c; background:#fdeaec; border:1px solid #f7ccd1}
+.b-gray{color:#5a6b78; background:#eef2f5; border:1px solid #dfe7ec}
+.b-purple{color:#5a2ca8; background:#f1eafd; border:1px solid #e2d3f8}
+.b-cyan{color:#0797bd; background:#e5f9ff; border:1px solid #c3eefb}
+.dotb{width:6px;height:6px;border-radius:50%}
+
+/* tables */
+.tbl{width:100%; border-collapse:collapse; font-size:12.6px}
+.tbl th{text-align:left; font-family:"JetBrains Mono"; font-size:9.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--faint); font-weight:600; padding:10px 14px; border-bottom:1px solid var(--soft-line); white-space:nowrap}
+.tbl td{padding:11px 14px; border-bottom:1px solid var(--soft-line); color:var(--text)}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tbody tr:hover{background:var(--soft)}
+.tbl td b, .tbl td strong{color:var(--ink); font-weight:600}
+.tbl .num{font-family:"JetBrains Mono"; text-align:right}
+.who{display:flex; align-items:center; gap:9px}
+.who .av{width:28px; height:28px; border-radius:50%; display:grid; place-items:center; color:#fff; font-size:10.5px; font-weight:700; flex:0 0 auto; font-family:"Inter"}
+
+/* bar chart */
+.bars{display:flex; align-items:flex-end; gap:10px; height:150px; padding-top:8px}
+.bar-col{flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; height:100%; justify-content:flex-end}
+.bar-col .bar{width:60%; max-width:34px; border-radius:6px 6px 0 0; background:linear-gradient(180deg,var(--cyan),#0a86a8); position:relative}
+.bar-col .bar.g2{background:linear-gradient(180deg,#cfe9f2,#a9d7e6)}
+.bar-col .bl{font-size:10px; color:var(--muted); font-family:"JetBrains Mono"}
+/* horizontal bars */
+.hbars{display:flex; flex-direction:column; gap:11px}
+.hbar{display:grid; grid-template-columns:120px 1fr 56px; align-items:center; gap:10px; font-size:12px}
+.hbar .hl{color:var(--text); font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.hbar .track{height:9px; background:var(--soft-2); border-radius:6px; overflow:hidden}
+.hbar .fill{height:100%; border-radius:6px; background:linear-gradient(90deg,var(--navy),var(--cyan))}
+.hbar .hv{font-family:"JetBrains Mono"; text-align:right; color:var(--ink); font-weight:600; font-size:11.5px}
+
+/* alerts */
+.alert{display:flex; gap:12px; padding:13px 15px; border-radius:11px; align-items:flex-start; margin-bottom:10px; border:1px solid}
+.alert:last-child{margin-bottom:0}
+.alert.red{background:#fdeef0; border-color:#f7ccd1}
+.alert.amber{background:#fdf6e7; border-color:#f3e3bd}
+.alert.blue{background:#eef5fd; border-color:#d3e6fa}
+.alert .aic{width:30px;height:30px;border-radius:8px; display:grid; place-items:center; flex:0 0 auto}
+.alert .aic svg{width:16px;height:16px; stroke:#fff; fill:none; stroke-width:2}
+.alert.red .aic{background:var(--red)} .alert.amber .aic{background:var(--amber)} .alert.blue .aic{background:var(--blue)}
+.alert h4{font-size:12.8px; margin-bottom:2px}
+.alert p{font-size:11.8px; color:var(--muted); line-height:1.4}
+.alert .at{font-family:"JetBrains Mono"; font-size:10px; color:var(--faint); margin-left:auto; white-space:nowrap}
+
+/* segmented tabs */
+.seg{display:inline-flex; background:var(--soft-2); border:1px solid var(--soft-line); border-radius:9px; padding:3px; gap:2px; margin-bottom:16px}
+.seg button{border:none; background:transparent; padding:6px 14px; border-radius:7px; font-size:12px; font-weight:600; color:var(--muted); cursor:pointer; font-family:"Inter"}
+.seg button.on{background:#fff; color:var(--navy); box-shadow:var(--shadow)}
+
+/* schedule matrix */
+.sched{display:flex; flex-direction:column; gap:10px}
+.crew-row{display:grid; grid-template-columns:160px 1fr; gap:12px; align-items:center}
+.crew-tag{display:flex; align-items:center; gap:9px}
+.crew-tag .cd{width:9px;height:9px;border-radius:50%}
+.crew-tag b{font-size:12.5px; color:var(--ink); font-family:"Sora"}
+.crew-tag span{font-size:10.5px; color:var(--muted); display:block}
+.jobs{display:flex; gap:8px; overflow-x:auto; padding-bottom:2px}
+.job{flex:0 0 auto; min-width:132px; border:1px solid var(--soft-line); border-left:3px solid var(--cyan); border-radius:9px; padding:9px 11px; background:#fff}
+.job.late{border-left-color:var(--red); background:#fef7f8}
+.job.done{border-left-color:var(--ok); opacity:.75}
+.job .jt{font-size:10px; color:var(--muted); font-family:"JetBrains Mono")}
+.job b{font-size:12px; color:var(--ink); display:block; margin:2px 0}
+.job small{font-size:10.5px; color:var(--muted)}
+
+/* progress line svg wrapper */
+.chartbox{padding:6px 4px 0}
+.legend-row{display:flex; gap:16px; margin-top:8px; padding:0 4px}
+.lg{display:flex; align-items:center; gap:6px; font-size:11px; color:var(--muted)}
+.lg .sw{width:11px;height:11px;border-radius:3px}
+
+/* two-col */
+.split{display:grid; grid-template-columns:1.6fr 1fr; gap:16px}
+@media(max-width:1180px){.split{grid-template-columns:1fr}}
+
+/* stat row inside cards */
+.mini{display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px dashed var(--soft-line); font-size:12.3px}
+.mini:last-child{border-bottom:none}
+.mini b{color:var(--ink); font-family:"JetBrains Mono"; font-weight:600}
+
+.note{font-size:11px; color:var(--faint); margin-top:14px; line-height:1.5}
+.pill-row{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px}
+.fpill{font-size:11.5px; padding:6px 11px; border-radius:8px; border:1px solid var(--line); background:#fff; color:var(--muted); cursor:pointer; font-weight:500}
+.fpill.on{border-color:var(--cyan); color:var(--navy); background:#e5f9ff; font-weight:600}
+
+/* ============ SIDEBAR v2 — collapsible + colored icons ============ */
+.side-top{justify-content:space-between}
+.side-brand{display:flex; align-items:center; gap:11px; min-width:0}
+.collapse-btn{width:28px; height:28px; border-radius:8px; border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.05); display:grid; place-items:center; cursor:pointer; flex:0 0 auto}
+.collapse-btn svg{width:15px; height:15px; stroke:#8fb4c5; fill:none; stroke-width:2}
+.collapse-btn:hover{background:rgba(255,255,255,.1)}
+
+.launch-btn{display:flex; align-items:center; gap:11px; margin:2px 4px 8px; padding:10px 10px; border-radius:9px; cursor:pointer;
+  background:linear-gradient(90deg,rgba(2,205,255,.18),rgba(2,205,255,.03)); color:#fff; font-weight:600; font-size:12.8px; border:1px solid rgba(2,205,255,.22); transition:.14s}
+.launch-btn:hover{background:linear-gradient(90deg,rgba(2,205,255,.28),rgba(2,205,255,.06))}
+.launch-btn.active{box-shadow:inset 0 0 0 1px rgba(2,205,255,.5)}
+.launch-btn .lb-ic{width:27px; height:27px; border-radius:8px; background:rgba(2,205,255,.2); display:grid; place-items:center; flex:0 0 auto}
+.launch-btn .lb-ic svg{width:15px; height:15px; stroke:var(--cyan); fill:none; stroke-width:2}
+
+/* colored module icon chip inside nav item */
+.nav-item{gap:11px}
+.ni-ic{width:27px; height:27px; border-radius:8px; display:grid; place-items:center; flex:0 0 auto; background:color-mix(in srgb, var(--a,#8fb4c5) 22%, transparent); transition:.14s}
+.ni-ic svg{width:15px; height:15px; stroke:var(--a,#a9c6d2); fill:none; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; margin:0}
+.nav-item.active .ni-ic{background:var(--a,#02CDFF)}
+.nav-item.active .ni-ic svg{stroke:#fff}
+.nav-item .ni-tx{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+
+/* ---- rail (collapsed) mode ---- */
+.app.rail{grid-template-columns:70px 1fr}
+.rail .ni-tx,.rail .nav-label,.rail .logo-txt-wrap,.rail .user-meta,.rail .nav-item .tag,.rail .launch-btn .lb-tx{display:none}
+.rail .side-top{justify-content:center; padding:16px 0 14px}
+.rail .collapse-btn{display:none}
+.rail .nav-item,.rail .launch-btn{justify-content:center; padding:8px 0; margin-left:8px; margin-right:8px}
+.rail .user{justify-content:center; padding:8px 0}
+.rail .side-scroll{padding:10px 6px 8px}
+.rail .nav-item{position:relative}
+.rail .nav-item:hover::after,.rail .launch-btn:hover::after{content:attr(data-title); position:absolute; left:64px; top:50%; transform:translateY(-50%); background:var(--ink); color:#fff; font-size:11.5px; font-weight:600; padding:5px 10px; border-radius:7px; white-space:nowrap; z-index:60; box-shadow:0 8px 20px -8px rgba(0,0,0,.5)}
+
+/* ============ MODULE LAUNCHER ============ */
+.launch-wrap{max-width:1200px}
+.launch-hero{background:linear-gradient(150deg,#013646,#01475D 60%,#013848); border-radius:18px; padding:26px 28px; color:#dcedf3; position:relative; overflow:hidden; margin-bottom:22px}
+.launch-hero::after{content:""; position:absolute; inset:0; background:radial-gradient(600px 300px at 88% -20%, rgba(2,205,255,.28), transparent 60%); pointer-events:none}
+.launch-hero .eyebrow{font-family:"JetBrains Mono"; font-size:10px; letter-spacing:.32em; color:#7fe4fb; text-transform:uppercase}
+.launch-hero h2{color:#fff; font-size:26px; margin:8px 0 6px; font-weight:800}
+.launch-hero p{color:#a9cede; font-size:13.5px; max-width:560px}
+.launch-hero .lh-stat{position:absolute; right:28px; bottom:24px; display:flex; gap:22px; text-align:right}
+.lh-stat .s b{font-family:"Sora"; font-size:22px; color:#fff; display:block; line-height:1}
+.lh-stat .s span{font-size:10px; color:#7fb0c4; font-family:"JetBrains Mono"; letter-spacing:.08em}
+@media(max-width:820px){.launch-hero .lh-stat{display:none}}
+
+.launch-tools{display:flex; align-items:center; gap:12px; margin-bottom:18px; flex-wrap:wrap}
+.msearch{position:relative; flex:1; min-width:220px; max-width:340px}
+.msearch input{width:100%; padding:9px 12px 9px 34px; border:1px solid var(--line); background:#fff; border-radius:10px; font-size:12.5px; font-family:"Inter"; color:var(--text)}
+.msearch input:focus{outline:none; border-color:var(--cyan)}
+.msearch svg{position:absolute; left:11px; top:10px; width:15px; height:15px; stroke:var(--faint); fill:none; stroke-width:2}
+
+.lgroup{margin-bottom:22px}
+.lgroup-head{display:flex; align-items:center; gap:10px; margin:0 2px 12px}
+.lgroup-head .lgl{font-family:"JetBrains Mono"; font-size:10px; letter-spacing:.24em; text-transform:uppercase; color:var(--cyan-ink); font-weight:600}
+.lgroup-head .lgc{font-size:11px; color:var(--faint)}
+.lgroup-head .line{flex:1; height:1px; background:var(--line)}
+.mgrid{display:grid; grid-template-columns:repeat(4,1fr); gap:14px}
+@media(max-width:1180px){.mgrid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){.mgrid{grid-template-columns:1fr}}
+
+.mcard{--a:var(--blue); background:var(--card); border:1px solid var(--soft-line); border-radius:14px; padding:16px; box-shadow:var(--shadow); cursor:pointer; position:relative; overflow:hidden; transition:transform .16s, box-shadow .16s, border-color .16s; display:flex; flex-direction:column; min-height:150px}
+.mcard::before{content:""; position:absolute; top:0; left:0; right:0; height:3px; background:var(--a); opacity:.85}
+.mcard:hover{transform:translateY(-4px); box-shadow:0 4px 10px rgba(1,54,70,.06),0 24px 44px -22px rgba(1,54,70,.4); border-color:color-mix(in srgb,var(--a) 42%, var(--soft-line))}
+.mcard.hide{display:none}
+.mc-top{display:flex; align-items:center; justify-content:space-between; margin-bottom:11px}
+.mc-ic{width:40px; height:40px; border-radius:11px; display:grid; place-items:center; background:var(--a); box-shadow:0 8px 18px -8px color-mix(in srgb,var(--a) 80%, transparent)}
+.mc-ic svg{width:20px; height:20px; stroke:#fff; fill:none; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round}
+.mc-rank{font-family:"JetBrains Mono"; font-size:9.5px; font-weight:700; color:var(--navy); background:#e5f9ff; border:1px solid #c3eefb; padding:3px 7px; border-radius:20px}
+.mcard h4{font-size:14px; font-weight:700; line-height:1.2}
+.mcard p{font-size:11.6px; color:var(--muted); margin-top:4px; line-height:1.4}
+.mc-foot{margin-top:auto; padding-top:12px; display:flex; align-items:center; justify-content:space-between}
+.ph{font-size:9.5px; font-weight:700; padding:3px 8px; border-radius:20px; font-family:"Inter"; letter-spacing:.02em}
+.ph-now{color:#0f7a45; background:#e6f6ec; border:1px solid #cbebd3}
+.ph-next{color:#0663a8; background:#e8f3fc; border:1px solid #cfe6f8}
+.ph-later{color:#5a6b78; background:#eef2f5; border:1px solid #dfe7ec}
+.mc-open{font-size:11px; font-weight:600; color:var(--cyan-ink); opacity:0; transform:translateX(-4px); transition:.16s}
+.mcard:hover .mc-open{opacity:1; transform:none}
+.no-hit{text-align:center; color:var(--faint); font-size:13px; padding:30px; display:none}
+
+/* ============================================================
+   LOGIN SCREEN
+   ============================================================ */
+#login{min-height:100vh; width:100vw; position:fixed; inset:0; z-index:200}
+.login-visual{flex:1.05; position:relative; overflow:hidden; color:#dcedf3;
+  background:radial-gradient(900px 500px at 78% -10%, rgba(2,205,255,.34), transparent 60%),
+             radial-gradient(700px 600px at 8% 120%, rgba(2,205,255,.16), transparent 60%),
+             linear-gradient(155deg,#013646 0%,#01475D 55%,#012a37 100%);
+  padding:52px 56px; display:flex; flex-direction:column; justify-content:space-between}
+.login-visual .lv-grid{position:absolute; inset:0; opacity:.5; pointer-events:none;
+  background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);
+  background-size:46px 46px; mask-image:radial-gradient(120% 100% at 80% 10%,#000 30%,transparent 82%)}
+.lv-brand{display:flex; align-items:center; gap:12px; position:relative}
+.lv-brand .logo-mark{width:44px;height:44px}
+.lv-brand .logo-mark svg{width:24px;height:24px}
+.lv-brand b{font-family:"Sora"; font-weight:800; font-size:21px; color:#fff}
+.lv-brand b i{font-style:normal; color:var(--cyan)}
+.lv-mid{position:relative; max-width:440px}
+.lv-mid .eyebrow{font-family:"JetBrains Mono"; font-size:11px; letter-spacing:.4em; color:#7fe4fb; text-transform:uppercase}
+.lv-bar{width:96px;height:5px;border-radius:4px;background:linear-gradient(90deg,#02CDFF,#7fe4fb);margin:16px 0 20px}
+.lv-mid h1{color:#fff; font-size:clamp(28px,3.4vw,42px); font-weight:800; letter-spacing:-.025em; line-height:1.05}
+.lv-mid p{color:#a9cede; font-size:15px; margin-top:14px; line-height:1.6}
+.lv-modrow{display:flex; gap:8px; flex-wrap:wrap; margin-top:26px; position:relative; max-width:440px}
+.lv-chip{display:flex; align-items:center; gap:7px; font-size:11px; color:#bfe4f0; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); padding:6px 11px; border-radius:100px}
+.lv-chip .d{width:7px;height:7px;border-radius:2px}
+.lv-foot{position:relative; font-size:11.5px; color:#5f93a8; font-family:"JetBrains Mono"; letter-spacing:.04em}
+
+.login-form-wrap{flex:.95; background:var(--bg); display:flex; align-items:center; justify-content:center; padding:40px}
+.login-card{width:100%; max-width:380px}
+.login-card .lc-h{font-size:24px; font-weight:700; margin-bottom:5px}
+.login-card .lc-sub{font-size:13.5px; color:var(--muted); margin-bottom:26px}
+.field{margin-bottom:15px}
+.field label{display:block; font-size:11.5px; font-weight:600; color:var(--text); margin-bottom:6px}
+.field .inp{position:relative}
+.field .inp svg{position:absolute; left:12px; top:12px; width:16px; height:16px; stroke:var(--faint); fill:none; stroke-width:1.9}
+.field input{width:100%; padding:11px 12px 11px 38px; border:1px solid var(--line); background:#fff; border-radius:10px; font-size:13.5px; font-family:"Inter"; color:var(--ink)}
+.field input:focus{outline:none; border-color:var(--cyan); box-shadow:0 0 0 3px rgba(2,205,255,.15)}
+.field .eye{left:auto; right:12px; cursor:pointer; stroke:var(--muted)}
+.login-row{display:flex; align-items:center; justify-content:space-between; margin:4px 0 22px; font-size:12.5px}
+.login-row label{display:flex; align-items:center; gap:7px; color:var(--text); cursor:pointer}
+.login-row .link{color:var(--cyan-ink); font-weight:600; cursor:pointer}
+.btn-login{width:100%; padding:12px; border:none; border-radius:10px; background:linear-gradient(150deg,var(--navy),#0a6d8c); color:#fff; font-weight:700; font-size:14px; font-family:"Inter"; cursor:pointer; box-shadow:0 14px 30px -12px rgba(1,71,93,.6); transition:.15s; display:flex; align-items:center; justify-content:center; gap:8px}
+.btn-login:hover{transform:translateY(-1px)}
+.btn-login svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2}
+.login-or{display:flex; align-items:center; gap:12px; margin:20px 0; color:var(--faint); font-size:11px}
+.login-or::before,.login-or::after{content:""; flex:1; height:1px; background:var(--line)}
+.sso{display:flex; gap:10px}
+.sso button{flex:1; padding:10px; border:1px solid var(--line); background:#fff; border-radius:10px; font-size:12.5px; font-weight:600; color:var(--text); cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; font-family:"Inter"}
+.sso button:hover{border-color:var(--cyan)}
+.sso svg{width:15px;height:15px}
+.login-demo{margin-top:22px; font-size:11px; color:var(--faint); text-align:center; line-height:1.6}
+.login-demo b{color:var(--muted)}
+@media(max-width:860px){#login{flex-direction:column} .login-visual{padding:34px 30px; flex:none} .lv-modrow,.lv-foot{display:none} .login-form-wrap{flex:1}}
+
+/* ============================================================
+   HUB — independent, elegant module selector
+   ============================================================ */
+#hub{min-height:100vh; background:var(--bg); overflow-y:auto}
+.hub-top{position:sticky; top:0; z-index:20; background:rgba(255,255,255,.9); backdrop-filter:saturate(180%) blur(10px); border-bottom:1px solid var(--line); height:60px; display:flex; align-items:center; padding:0 30px; gap:14px}
+.hub-top .ht-brand{display:flex; align-items:center; gap:11px}
+.hub-top .ht-brand .logo-mark{width:34px;height:34px}
+.hub-top .ht-brand .logo-mark svg{width:18px;height:18px}
+.hub-top .ht-brand b{font-family:"Sora"; font-weight:800; font-size:17px; color:var(--ink)}
+.hub-top .ht-brand b i{font-style:normal; color:var(--cyan-ink)}
+.hub-top .wspill{margin-left:6px}
+.hub-top .ht-right{margin-left:auto; display:flex; align-items:center; gap:12px}
+.ht-user{display:flex; align-items:center; gap:9px}
+.ht-user .avatar{width:32px;height:32px}
+.ht-user .um{line-height:1.2}
+.ht-user .um b{font-family:"Sora"; font-size:12.5px; color:var(--ink); display:block}
+.ht-user .um span{font-size:10.5px; color:var(--muted)}
+.logout-btn{display:flex; align-items:center; gap:7px; font-size:12px; font-weight:600; color:var(--muted); padding:7px 12px; border:1px solid var(--line); border-radius:9px; background:#fff; cursor:pointer}
+.logout-btn:hover{border-color:var(--red); color:var(--red)}
+.logout-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+.hub-body{max-width:1200px; margin:0 auto; padding:30px 30px 60px}
+
+/* ============================================================
+   FUNCTIONAL: modal · toast · notifications · menus
+   ============================================================ */
+/* overlay + modal */
+.ov{position:fixed; inset:0; z-index:300; background:rgba(6,32,44,.5); backdrop-filter:blur(3px); display:none; align-items:center; justify-content:center; padding:20px}
+.ov.show{display:flex; animation:ovin .18s ease}
+@keyframes ovin{from{opacity:0}to{opacity:1}}
+.modal{width:100%; max-width:460px; background:var(--card); border-radius:16px; box-shadow:0 30px 70px -20px rgba(1,54,70,.55); overflow:hidden; animation:mup .2s ease}
+@keyframes mup{from{opacity:0; transform:translateY(12px)}to{opacity:1; transform:none}}
+.modal-head{display:flex; align-items:center; gap:12px; padding:18px 20px; border-bottom:1px solid var(--soft-line)}
+.modal-head .mh-ic{width:36px; height:36px; border-radius:10px; background:linear-gradient(150deg,var(--navy),#0a6d8c); display:grid; place-items:center; flex:0 0 auto}
+.modal-head .mh-ic svg{width:18px; height:18px; stroke:#fff; fill:none; stroke-width:2}
+.modal-head h3{font-size:16px; font-weight:700}
+.modal-head p{font-size:11.5px; color:var(--muted); margin-top:1px}
+.modal-x{margin-left:auto; width:30px; height:30px; border-radius:8px; border:1px solid var(--line); background:var(--soft); display:grid; place-items:center; cursor:pointer; flex:0 0 auto}
+.modal-x svg{width:14px; height:14px; stroke:var(--muted); fill:none; stroke-width:2}
+.modal-x:hover{border-color:var(--red)} .modal-x:hover svg{stroke:var(--red)}
+.modal-body{padding:18px 20px; display:flex; flex-direction:column; gap:13px; max-height:60vh; overflow-y:auto}
+.mfield label{display:block; font-size:11.5px; font-weight:600; color:var(--text); margin-bottom:5px}
+.mfield input,.mfield select,.mfield textarea{width:100%; padding:9px 11px; border:1px solid var(--line); background:#fff; border-radius:9px; font-size:13px; font-family:"Inter"; color:var(--ink)}
+.mfield input:focus,.mfield select:focus,.mfield textarea:focus{outline:none; border-color:var(--cyan); box-shadow:0 0 0 3px rgba(2,205,255,.14)}
+.mfield.two{display:grid; grid-template-columns:1fr 1fr; gap:11px}
+.modal-foot{padding:14px 20px; border-top:1px solid var(--soft-line); display:flex; gap:10px; justify-content:flex-end; background:var(--soft)}
+
+/* toast */
+#toastWrap{position:fixed; right:20px; bottom:20px; z-index:400; display:flex; flex-direction:column; gap:10px; pointer-events:none}
+.toast{display:flex; align-items:center; gap:11px; background:var(--ink); color:#fff; padding:12px 16px; border-radius:11px; box-shadow:0 18px 40px -14px rgba(0,0,0,.5); font-size:13px; font-weight:500; min-width:240px; animation:tin .22s ease; pointer-events:auto}
+.toast.out{animation:tout .25s ease forwards}
+@keyframes tin{from{opacity:0; transform:translateX(20px)}to{opacity:1; transform:none}}
+@keyframes tout{to{opacity:0; transform:translateX(20px)}}
+.toast .tk{width:22px; height:22px; border-radius:50%; display:grid; place-items:center; flex:0 0 auto; background:var(--ok)}
+.toast .tk svg{width:13px; height:13px; stroke:#fff; fill:none; stroke-width:2.4}
+
+/* notifications dropdown */
+.dd{position:absolute; top:52px; right:20px; width:320px; background:var(--card); border:1px solid var(--soft-line); border-radius:13px; box-shadow:0 24px 50px -18px rgba(1,54,70,.4); z-index:90; overflow:hidden; display:none}
+.dd.show{display:block; animation:mup .16s ease}
+.dd-head{padding:13px 15px; border-bottom:1px solid var(--soft-line); display:flex; align-items:center; justify-content:space-between}
+.dd-head h4{font-size:13px; font-weight:700}
+.dd-head span{font-size:11px; color:var(--cyan-ink); font-weight:600; cursor:pointer}
+.dd-item{display:flex; gap:10px; padding:12px 15px; border-bottom:1px solid var(--soft-line); cursor:pointer; transition:.12s}
+.dd-item:last-child{border-bottom:none}
+.dd-item:hover{background:var(--soft)}
+.dd-dot{width:8px; height:8px; border-radius:50%; margin-top:5px; flex:0 0 auto}
+.dd-item h5{font-size:12.5px; font-weight:600; color:var(--ink)}
+.dd-item p{font-size:11px; color:var(--muted); margin-top:1px; line-height:1.35}
+.dd-item .tm{font-size:9.5px; color:var(--faint); font-family:"JetBrains Mono"; margin-left:auto; white-space:nowrap}
+
+/* row + clickable affordance */
+.tbl tbody tr{cursor:pointer}
+.no-rows{display:none; text-align:center; color:var(--faint); font-size:12.5px; padding:22px}
+.fpill{user-select:none}
+
+/* login error shake */
+.shake{animation:shake .4s}
+@keyframes shake{0%,100%{transform:none}20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
+.field.err input{border-color:var(--red); box-shadow:0 0 0 3px rgba(239,69,83,.14)}
+
+/* ============================================================
+   BRAND WORDMARK — recreated from the official TidyUp! logo
+   ============================================================ */
+.wm{display:inline-flex; align-items:baseline; gap:0; font-family:"Sora",system-ui,sans-serif; font-weight:800; letter-spacing:-.035em; line-height:1; white-space:nowrap}
+.wm .wm-tidy{color:var(--navy)}
+.wm .wm-up{color:var(--cyan)}
+.wm.on-dark .wm-tidy{color:#ffffff}
+.wm .wm-broom{width:.5em; height:1.06em; align-self:center; margin-left:.14em; transform:translateY(-.04em)}
+.wm .wm-broom .handle{fill:var(--cyan)}
+.wm .wm-broom .bristle{fill:var(--navy)}
+.wm.on-dark .wm-broom .bristle{fill:#e2edf3}
+.wmblock{display:flex; flex-direction:column; gap:5px; align-items:flex-start}
+.wm-tag{font-family:"Sora",system-ui,sans-serif; font-weight:600; letter-spacing:.32em; color:var(--navy); text-transform:uppercase}
+.wmblock.on-dark .wm-tag{color:#8fb9cc}
+
+/* ============================================================
+   VISUAL REFINEMENT PASS — professional polish (client palette)
+   placed last so it wins the cascade over base component rules
+   ============================================================ */
+/* buttons */
+.btn{border-radius:10px; padding:8px 15px; font-weight:600; border:1px solid var(--line); background:#fff; color:var(--text); transition:transform .14s, box-shadow .14s, border-color .14s, background .14s}
+.btn:hover{border-color:var(--cyan); color:var(--navy); box-shadow:0 6px 16px -10px rgba(3,45,58,.4)}
+.btn.primary{background:var(--navy); border:1px solid var(--navy); color:#fff; box-shadow:0 10px 22px -12px rgba(1,71,93,.7)}
+.btn.primary:hover{background:#013a4d; color:#fff; transform:translateY(-1px); box-shadow:0 14px 28px -12px rgba(1,71,93,.75)}
+.btn.primary svg{stroke:#fff}
+
+/* topbar */
+.topbar{height:60px; background:rgba(255,255,255,.82); backdrop-filter:saturate(180%) blur(14px); border-bottom:1px solid var(--line); box-shadow:0 1px 0 rgba(3,45,58,.02)}
+.tb-title{letter-spacing:-.02em}
+.tb-crumb{letter-spacing:.12em; font-size:10px; color:var(--faint)}
+.search input{border-radius:10px; background:var(--soft); transition:.15s}
+.search input:focus{box-shadow:0 0 0 3px rgba(2,205,255,.14); background:#fff}
+.icon-btn{border-radius:10px; transition:.15s}
+.icon-btn:hover{border-color:var(--cyan); background:#fff}
+
+/* sidebar refinement */
+.side{background:linear-gradient(190deg,#013a4d 0%,#012230 100%)}
+.side-top{padding:17px 16px 15px}
+.nav-item{border-radius:9px; font-size:12.6px; letter-spacing:-.005em}
+.nav-item.active{background:linear-gradient(90deg,rgba(2,205,255,.18),rgba(2,205,255,.02))}
+.nav-label{letter-spacing:.22em; color:#4f7688}
+.wspill{border-radius:9px; font-weight:600}
+
+/* cards */
+.card{border:1px solid var(--soft-line); border-radius:var(--radius); box-shadow:var(--shadow); transition:box-shadow .18s, border-color .18s}
+.card-head{padding:14px 18px 13px}
+.card-head h3{font-size:13.5px; letter-spacing:-.01em}
+.card-head .sub{font-size:10.5px; letter-spacing:.02em; color:var(--faint)}
+
+/* KPI cards */
+.kpi{border-radius:var(--radius); padding:16px 17px; box-shadow:var(--shadow); border:1px solid var(--soft-line); position:relative; overflow:hidden; transition:transform .16s, box-shadow .16s}
+.kpi::after{content:""; position:absolute; inset:0 auto 0 0; width:3px; background:var(--cyan); opacity:.0; transition:.16s}
+.kpi:hover{transform:translateY(-2px); box-shadow:var(--shadow-md)}
+.kpi:hover::after{opacity:.9}
+.kpi .kico{border-radius:10px; box-shadow:0 8px 16px -8px rgba(3,45,58,.4)}
+.kpi .klabel{letter-spacing:.06em; font-size:10.5px; color:var(--muted)}
+.kpi .kval{font-size:26px; letter-spacing:-.03em; margin-top:3px}
+.kpi .kdelta{font-weight:600}
+
+/* tables */
+.tbl th{letter-spacing:.1em; font-size:9.5px; color:var(--faint); padding:11px 15px; background:var(--soft); border-bottom:1px solid var(--soft-line)}
+.tbl td{padding:12px 15px; font-size:12.7px}
+.tbl tbody tr{transition:background .12s}
+.tbl tbody tr:nth-child(even){background:rgba(233,242,245,.4)}
+.tbl tbody tr:hover{background:var(--cyan-soft)}
+.who .av{box-shadow:0 4px 10px -5px rgba(3,45,58,.5)}
+
+/* badges — a touch softer/rounder */
+.badge{border-radius:7px; font-weight:600; letter-spacing:.01em}
+
+/* eyebrow / labels */
+.page-head h2{letter-spacing:-.025em}
+.page-head p{color:var(--muted)}
+.sec-label .k,.lgroup-head .lgl{letter-spacing:.24em}
+
+/* hbars & bars use brand gradient */
+.hbar .fill{background:linear-gradient(90deg,var(--navy),var(--cyan))}
+.bar-col .bar{background:linear-gradient(180deg,var(--cyan),#0a7f9f)}
+
+/* hero / launcher */
+.launch-hero{border-radius:var(--radius-lg); box-shadow:var(--shadow-md)}
+.launch-hero h2{letter-spacing:-.03em}
+.mcard{border-radius:var(--radius); transition:transform .16s, box-shadow .16s, border-color .16s}
+.mc-ic{border-radius:12px; box-shadow:0 10px 20px -9px color-mix(in srgb,var(--a) 75%, transparent)}
+.mcard h4{letter-spacing:-.015em}
+
+/* login polish */
+.login-visual{padding:56px 58px}
+.lv-mid h1{letter-spacing:-.03em; line-height:1.04}
+.btn-login{border-radius:11px; letter-spacing:.01em; box-shadow:0 16px 34px -14px rgba(1,71,93,.55)}
+.login-card .lc-h{letter-spacing:-.02em}
+.field input{border-radius:10px}
+
+/* modal */
+.modal{border-radius:var(--radius-lg); box-shadow:var(--shadow-lg)}
+
+/* alerts a bit crisper */
+.alert{border-radius:12px}
+.alert h4{letter-spacing:-.01em}
+</style>
+</head>
+<body class="stage-login">
+
+<!-- ============================================================ LOGIN -->
+<div id="login">
+  <div class="login-visual">
+    <div class="lv-grid"></div>
+    <div class="lv-brand">
+      <div class="wmblock on-dark">
+        <span class="wm on-dark" style="font-size:38px">
+          <span class="wm-tidy">Tidy</span><span class="wm-up">up</span>
+          <svg class="wm-broom" viewBox="0 0 16 24" aria-hidden="true"><rect class="handle" x="6.8" y="1.5" width="2.4" height="12" rx="1.2"/><path class="bristle" d="M4 13.5h8l1.2 7.9c.05.35-.2.6-.55.6H3.35c-.35 0-.6-.25-.55-.6L4 13.5Z"/></svg>
+        </span>
+        <span class="wm-tag" style="font-size:11px">Professional Cleaning Services</span>
+      </div>
+    </div>
+    <div class="lv-mid">
+      <div class="eyebrow">Operating Hub</div>
+      <div class="lv-bar"></div>
+      <h1>Run the whole operation from one place.</h1>
+      <p>Operations, people, customers and finances — connected to Housecall Pro and QuickBooks, built to grow with TidyUp!</p>
+      <div class="lv-modrow">
+        <span class="lv-chip"><span class="d" style="background:var(--green)"></span>Finance</span>
+        <span class="lv-chip"><span class="d" style="background:var(--green)"></span>Payroll</span>
+        <span class="lv-chip"><span class="d" style="background:var(--blue)"></span>Scheduling</span>
+        <span class="lv-chip"><span class="d" style="background:var(--teal)"></span>Customers</span>
+        <span class="lv-chip"><span class="d" style="background:var(--blue)"></span>Reporting</span>
+        <span class="lv-chip"><span class="d" style="background:var(--faint)"></span>+7 more</span>
+      </div>
+    </div>
+    <div class="lv-foot">TidyUp! Professional Cleaning Services LLC · Midland · Odessa · Greenwood TX</div>
+  </div>
+
+  <div class="login-form-wrap">
+    <div class="login-card">
+      <div class="lc-h">Welcome back</div>
+      <div class="lc-sub">Sign in to your operating hub.</div>
+      <form id="loginForm" autocomplete="off">
+        <div class="field">
+          <label>Email</label>
+          <div class="inp">
+            <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+            <input type="email" id="loginEmail" value="gabi@tidyupmidland.com"/>
+          </div>
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <div class="inp">
+            <svg viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+            <input type="password" id="loginPass" value="tidyup2026"/>
+            <svg class="eye" id="eyeToggle" viewBox="0 0 24 24" fill="none" stroke-width="1.9"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+          </div>
+        </div>
+        <div class="login-row">
+          <label><input type="checkbox" checked/> Remember me</label>
+          <span class="link">Forgot password?</span>
+        </div>
+        <button type="submit" class="btn-login" id="loginBtn">
+          Sign in
+          <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+      </form>
+      <div class="login-or">or continue with</div>
+      <div class="sso">
+        <button><svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.5 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.9a5 5 0 0 1-2.2 3.3v2.7h3.6c2.1-1.9 3.2-4.8 3.2-7.8Z"/><path fill="#34A853" d="M12 23c2.9 0 5.4-1 7.2-2.7l-3.6-2.7c-1 .7-2.3 1.1-3.6 1.1-2.8 0-5.1-1.9-6-4.4H2.3v2.8A11 11 0 0 0 12 23Z"/><path fill="#FBBC05" d="M6 14.3a6.6 6.6 0 0 1 0-4.2V7.3H2.3a11 11 0 0 0 0 9.8L6 14.3Z"/><path fill="#EA4335" d="M12 5.5c1.6 0 3 .6 4.1 1.6l3.1-3.1A11 11 0 0 0 2.3 7.3L6 10.1c.9-2.6 3.2-4.6 6-4.6Z"/></svg>Google</button>
+        <button><svg viewBox="0 0 24 24"><path fill="#00A4EF" d="M3 3h8v8H3z"/><path fill="#7FBA00" d="M13 3h8v8h-8z"/><path fill="#FFB900" d="M3 13h8v8H3z"/><path fill="#F25022" d="M13 13h8v8h-8z"/></svg>Microsoft</button>
+      </div>
+      <div class="login-demo">Demo — any credentials work. <b>Sign in</b> to open the module hub.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ HUB (module selector) -->
+<div id="hub">
+  <div class="hub-top">
+    <div class="ht-brand">
+      <span class="wm" style="font-size:22px">
+        <span class="wm-tidy">Tidy</span><span class="wm-up">up</span>
+        <svg class="wm-broom" viewBox="0 0 16 24" aria-hidden="true"><rect class="handle" x="6.8" y="1.5" width="2.4" height="12" rx="1.2"/><path class="bristle" d="M4 13.5h8l1.2 7.9c.05.35-.2.6-.55.6H3.35c-.35 0-.6-.25-.55-.6L4 13.5Z"/></svg>
+      </span>
+    </div>
+    <div class="wspill"><span class="dot"></span>Midland HQ</div>
+    <div class="ht-right">
+      <div class="ht-user"><div class="avatar">GB</div><div class="um"><b>Gabi Bilard</b><span>Owner</span></div></div>
+      <button class="logout-btn" id="logoutHub"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg>Log out</button>
+    </div>
+  </div>
+
+  <div class="hub-body">
+    <div class="launch-hero">
+      <div class="eyebrow">TidyUp! Operating Hub · Midland TX</div>
+      <h2>Choose a module</h2>
+      <p>One hub for operations, people, customers and finances — fed by Housecall Pro and QuickBooks. Financials ship first; the rest is a phased roadmap.</p>
+      <div class="lh-stat">
+        <div class="s"><b>12</b><span>MODULES</span></div>
+        <div class="s"><b>4</b><span>LAYERS</span></div>
+        <div class="s"><b>3</b><span>LIVE NOW</span></div>
+      </div>
+    </div>
+
+    <div class="launch-tools">
+      <div class="msearch">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="modSearch" placeholder="Search modules…"/>
+      </div>
+      <div class="pill-row" style="margin:0" id="phaseFilter">
+        <span class="fpill on" data-ph="all">All</span>
+        <span class="fpill" data-ph="now">Live now</span>
+        <span class="fpill" data-ph="next">Next</span>
+        <span class="fpill" data-ph="later">Roadmap</span>
+      </div>
+    </div>
+
+    <div id="modResults">
+      <div class="lgroup" data-layer="operations">
+        <div class="lgroup-head"><span class="lgl">Operations</span><span class="lgc">4 modules</span><span class="line"></span></div>
+        <div class="mgrid">
+          <div class="mcard" data-go="scheduling" data-ph="next" data-name="scheduling dispatch crew" style="--a:var(--blue)">
+            <div class="mc-top"><span class="mc-ic"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span><span class="mc-rank">P5</span></div>
+            <h4>Scheduling &amp; Dispatch</h4><p>Crew sizing, recurring jobs, vehicle-aware dispatch</p>
+            <div class="mc-foot"><span class="ph ph-next">Next</span><span class="mc-open">Open →</span></div>
+          </div>
+          <div class="mcard" data-go="workorders" data-ph="next" data-name="work orders jobs status" style="--a:var(--blue)">
+            <div class="mc-top"><span class="mc-ic"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg></span></div>
+            <h4>Work Orders</h4><p>Service details, status, before/after, est. vs actual</p>
+            <div class="mc-foot"><span class="ph ph-next">Next</span><span class="mc-open">Open →</span></div>
+          </div>
+          <div class="mcard" data-go="inventory" data-ph="later" data-name="inventory supplies stock materials" style="--a:var(--orange)">
+            <div class="mc-top"><span class="mc-ic"><svg viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="M3 8l9 5 9-5"/></svg></span><span class="mc-rank">P6</span></div>
+            <h4>Inventory &amp; Supplies</h4><p>Products, equipment, reorder alerts, consumption</p>
+            <div class="mc-foot"><span class="ph ph-later">Roadmap</span><span class="mc-open">Open →</span></div>
+          </div>
+          <div class="mcard" data-go="procurement" data-ph="later" data-name="procurement vendors suppliers purchase orders" style="--a:var(--purple)">
+            <div class="mc-top"><span class="mc-ic"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.5 3H5l2.7 12.4a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.6L21 7H6"/></svg></span></div>
+            <h4>Procurement &amp; Vendors</h4><p>Suppliers, purchase orders, expense approval</p>
+            <div class="mc-foot"><span class="ph ph-later">Roadmap</span><span class="mc-open">Open →</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lgroup" data-layer="customers">
+        <div class="lgroup-head"><span class="lgl">Customers</span><span class="lgc">4 modules</span><span class="line"></span></div>
+        <div class="mgrid">
+          <div class="mcard" data-go="customers" data-ph="next" data-name="customer management leads churn" style="--a:var(--teal)">
+            <div class="mc-top"><span class="mc-ic"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg></span><span class="mc-rank">P4</span></div>
+            <h4>Customer Management</h4><p>Profiles, history, leads with source, churn signals</p>
+            <div class="mc-foot"><span class="ph ph-next">Next</span><span class="mc-open">Open →</span></div>
+          </div>
+          <div class="mcard" data-go="sales" data-ph="later" data-name="sales quotation quotes pricing" style="--a:var(--amber)">
+            <div class="mc-top"><span class="mc-ic"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></span></div>
+            <h4>Sales &amp; Quotation</h4><p>Quote-to-job, pricing calculator, packages</p>
+            <div class="mc-foot"><span class="ph ph-later">Roadmap</span><span class="mc-open">Open →</span></div>
+          </div>
+          <div class="mcard" data-go="communication" data-ph="later" data-name="communication messages reminders feedback" style="--a:var(--purple)">
+            <div class="mc-top"><span class="mc-ic"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span></div>
+            <h4>Customer Communication</h4><p>Confirmations, reminders, feedback channel</p>
+            <div class="mc-foot"><span class="ph ph-later">Roadmap</span><span class="mc-open">Open →</span></div>
+          </div>
+          <div class="mcard" data-go="quality" data-ph="later" data-name="quality compliance complaints checklists" style="--a:var(--red)">
+            <div class="mc-top"><span class="mc-ic"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></span></div>
+            <h4>Quality &amp; Compliance</h4><p>Complaints, inspections, the service guarantee</p>
+            <div class="mc-foot"><span class="ph ph-later">Roadmap</span><span class="mc-open">Open →</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lgroup" data-layer="people">
+        <div class="lgroup-head"><span class="lgl">People</span><span class="lgc">2 modules</span><span class="line"></span></div>
+        <div class="mgrid">
+          <div class="mcard" data-go="workforce" data-ph="later" data-name="workforce employees skills attendance" style="--a:var(--teal)">
+            <div class="mc-top"><span class="mc-ic"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg></span></div>
+            <h4>Workforce Management</h4><p>Availability, skills, attendance, productivity</p>
+            <div class="mc-foot"><span class="ph ph-later">Roadmap</span><span class="mc-open">Open →</span></div>
+          </div>
+          <div class="mcard" data-go="payroll" data-ph="now" data-name="payroll time tracking timesheets bonuses" style="--a:var(--green)">
+            <div class="mc-top"><span class="mc-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><span class="mc-rank">P2</span></div>
+            <h4>Payroll &amp; Time Tracking</h4><p>Dual pay regime, material hours, bonuses as cost</p>
+            <div class="mc-foot"><span class="ph ph-now">Live now</span><span class="mc-open">Open →</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lgroup" data-layer="finance">
+        <div class="lgroup-head"><span class="lgl">Finance</span><span class="lgc">2 modules</span><span class="line"></span></div>
+        <div class="mgrid">
+          <div class="mcard" data-go="finance" data-ph="now" data-name="finance accounting invoicing receivables raise" style="--a:var(--green)">
+            <div class="mc-top"><span class="mc-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M14.5 9.5a2.5 2 0 0 0-2.5-1.5c-1.4 0-2.5.7-2.5 1.8s1.1 1.5 2.5 1.9 2.5.8 2.5 1.9-1.1 1.8-2.5 1.8a2.5 2 0 0 1-2.5-1.5"/></svg></span><span class="mc-rank">P1</span></div>
+            <h4>Finance &amp; Accounting</h4><p>Invoicing, receivables, the raise decision</p>
+            <div class="mc-foot"><span class="ph ph-now">Live now</span><span class="mc-open">Open →</span></div>
+          </div>
+          <div class="mcard" data-go="bi" data-ph="now" data-name="business intelligence reporting revenue margin" style="--a:var(--blue)">
+            <div class="mc-top"><span class="mc-ic"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6"/><rect x="12" y="8" width="3" height="10"/><rect x="17" y="4" width="3" height="14"/></svg></span><span class="mc-rank">P3</span></div>
+            <h4>Business Intelligence</h4><p>The six reporting screens · revenue &amp; margin</p>
+            <div class="mc-foot"><span class="ph ph-now">Live now</span><span class="mc-open">Open →</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="no-hit" id="noHit">No module matches your search.</div>
+  </div>
+</div>
+
+<div class="app">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="side">
+    <div class="side-top">
+      <div class="side-brand">
+        <div class="logo-mark">
+          <svg viewBox="0 0 24 24"><path d="M19.4 4.6 13 11"/><path d="M9 15c-2 2-3 3-6.5 3.5C3 15 4 14 6 12l3 3Z"/><path d="m10.5 10.5 3 3"/></svg>
+        </div>
+        <div class="logo-txt-wrap">
+          <span class="wm on-dark" style="font-size:19px">
+            <span class="wm-tidy">Tidy</span><span class="wm-up">up</span>
+            <svg class="wm-broom" viewBox="0 0 16 24" aria-hidden="true"><rect class="handle" x="6.8" y="1.5" width="2.4" height="12" rx="1.2"/><path class="bristle" d="M4 13.5h8l1.2 7.9c.05.35-.2.6-.55.6H3.35c-.35 0-.6-.25-.55-.6L4 13.5Z"/></svg>
+          </span>
+          <div class="logo-sub" style="margin-top:3px">OPERATING HUB</div>
+        </div>
+      </div>
+      <div class="collapse-btn" id="collapseBtn" title="Collapse">
+        <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+      </div>
+    </div>
+
+    <div class="side-scroll">
+      <div class="launch-btn" data-view="launcher" data-title="All Modules" data-crumb="HUB / ALL MODULES">
+        <span class="lb-ic"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>
+        <span class="lb-tx">All Modules</span>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-item" data-view="dashboard" data-title="Dashboard" data-crumb="HOME / OVERVIEW">
+          <span class="ni-ic" style="--a:var(--cyan-ink)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg></span>
+          <span class="ni-tx">Dashboard</span>
+        </div>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-label">Operations</div>
+        <div class="nav-item" data-view="scheduling" data-title="Scheduling &amp; Dispatch" data-crumb="OPERATIONS / SCHEDULING">
+          <span class="ni-ic" style="--a:var(--blue)"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span>
+          <span class="ni-tx">Scheduling &amp; Dispatch</span><span class="tag soft">18</span>
+        </div>
+        <div class="nav-item" data-view="workorders" data-title="Work Orders" data-crumb="OPERATIONS / WORK ORDERS">
+          <span class="ni-ic" style="--a:var(--blue)"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg></span>
+          <span class="ni-tx">Work Orders</span>
+        </div>
+        <div class="nav-item" data-view="inventory" data-title="Inventory &amp; Supplies" data-crumb="OPERATIONS / INVENTORY">
+          <span class="ni-ic" style="--a:var(--orange)"><svg viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="M3 8l9 5 9-5"/></svg></span>
+          <span class="ni-tx">Inventory &amp; Supplies</span><span class="tag">3</span>
+        </div>
+        <div class="nav-item" data-view="procurement" data-title="Procurement &amp; Vendors" data-crumb="OPERATIONS / PROCUREMENT">
+          <span class="ni-ic" style="--a:var(--purple)"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.5 3H5l2.7 12.4a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.6L21 7H6"/></svg></span>
+          <span class="ni-tx">Procurement</span>
+        </div>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-label">Customers</div>
+        <div class="nav-item" data-view="customers" data-title="Customer Management" data-crumb="CUSTOMERS / DIRECTORY">
+          <span class="ni-ic" style="--a:var(--teal)"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg></span>
+          <span class="ni-tx">Customer Management</span>
+        </div>
+        <div class="nav-item" data-view="sales" data-title="Sales &amp; Quotation" data-crumb="CUSTOMERS / QUOTES">
+          <span class="ni-ic" style="--a:var(--amber)"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></span>
+          <span class="ni-tx">Sales &amp; Quotation</span>
+        </div>
+        <div class="nav-item" data-view="communication" data-title="Customer Communication" data-crumb="CUSTOMERS / MESSAGES">
+          <span class="ni-ic" style="--a:var(--purple)"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+          <span class="ni-tx">Communication</span><span class="tag">5</span>
+        </div>
+        <div class="nav-item" data-view="quality" data-title="Quality &amp; Compliance" data-crumb="CUSTOMERS / QUALITY">
+          <span class="ni-ic" style="--a:var(--red)"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></span>
+          <span class="ni-tx">Quality &amp; Compliance</span><span class="tag">1</span>
+        </div>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-label">People</div>
+        <div class="nav-item" data-view="workforce" data-title="Workforce Management" data-crumb="PEOPLE / WORKFORCE">
+          <span class="ni-ic" style="--a:var(--teal)"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg></span>
+          <span class="ni-tx">Workforce</span>
+        </div>
+        <div class="nav-item" data-view="payroll" data-title="Payroll &amp; Time Tracking" data-crumb="PEOPLE / PAYROLL">
+          <span class="ni-ic" style="--a:var(--green)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+          <span class="ni-tx">Payroll &amp; Time</span>
+        </div>
+      </div>
+
+      <div class="nav-group">
+        <div class="nav-label">Finance</div>
+        <div class="nav-item" data-view="finance" data-title="Finance &amp; Accounting" data-crumb="FINANCE / ACCOUNTING">
+          <span class="ni-ic" style="--a:var(--green)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M14.5 9.5a2.5 2 0 0 0-2.5-1.5c-1.4 0-2.5.7-2.5 1.8s1.1 1.5 2.5 1.9 2.5.8 2.5 1.9-1.1 1.8-2.5 1.8a2.5 2 0 0 1-2.5-1.5"/></svg></span>
+          <span class="ni-tx">Finance &amp; Accounting</span>
+        </div>
+        <div class="nav-item" data-view="bi" data-title="Business Intelligence" data-crumb="FINANCE / REPORTING">
+          <span class="ni-ic" style="--a:var(--blue)"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6"/><rect x="12" y="8" width="3" height="10"/><rect x="17" y="4" width="3" height="14"/></svg></span>
+          <span class="ni-tx">Business Intelligence</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-foot">
+      <div class="user">
+        <div class="avatar">GB</div>
+        <div class="user-meta"><b>Gabi Bilard</b><span>Owner · Full access</span></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <div class="tb-title" id="tbTitle">Dashboard</div>
+        <div class="tb-crumb" id="tbCrumb">HOME / OVERVIEW</div>
+      </div>
+      <div class="search">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="globalSearch" placeholder="Filter this screen…"/>
+      </div>
+      <div class="tb-right">
+        <div class="wspill"><span class="dot"></span>Midland HQ</div>
+        <div class="icon-btn" id="notifBtn" title="Notifications"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="badge">3</span></div>
+        <div class="icon-btn" id="gearBtn" title="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1V21a2 2 0 0 1-4 0v-.1A1.6 1.6 0 0 0 7 19.4a1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0-1.1-2.7H1a2 2 0 0 1 0-4h.1A1.6 1.6 0 0 0 2.6 7"/></svg></div>
+      </div>
+    </div>
+
+    <div class="canvas">
+
+      <!-- ========================================================= LAUNCHER (legacy, replaced by #hub) -->
+      <section class="view" id="view-launcher" hidden>
+        <div class="launch-wrap">
+          <div class="launch-hero">
+            <div class="eyebrow">TidyUp! Operating Hub · Midland TX</div>
+            <h2>Choose a module</h2>
+            <p>One hub for operations, people, customers and finances — fed by Housecall Pro and QuickBooks. Financials ship first; the rest is a phased roadmap.</p>
+            <div class="lh-stat">
+              <div class="s"><b>12</b><span>MODULES</span></div>
+              <div class="s"><b>4</b><span>LAYERS</span></div>
+              <div class="s"><b>3</b><span>LIVE NOW</span></div>
+            </div>
+          </div>
+
+          <div class="launch-tools">
+            <div class="msearch">
+              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+              <input id="modSearch" placeholder="Search modules…"/>
+            </div>
+            <div class="pill-row" style="margin:0" id="phaseFilter">
+              <span class="fpill on" data-ph="all">All</span>
+              <span class="fpill" data-ph="now">Live now</span>
+              <span class="fpill" data-ph="next">Next</span>
+              <span class="fpill" data-ph="later">Roadmap</span>
+            </div>
+          </div>
+
+          <div id="modResults">
+            <!-- OPERATIONS -->
+            <div class="lgroup" data-layer="operations">
+              <div class="lgroup-head"><span class="lgl">Operations</span><span class="lgc">4 modules</span><span class="line"></span></div>
+              <div class="mgrid">
+                <div class="mcard" data-go="scheduling" data-ph="next" data-name="scheduling dispatch crew" style="--a:var(--blue)">
+                  <div class="mc-top"><span class="mc-ic"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span><span class="mc-rank">P5</span></div>
+                  <h4>Scheduling &amp; Dispatch</h4><p>Crew sizing, recurring jobs, vehicle-aware dispatch</p>
+                  <div class="mc-foot"><span class="ph ph-next">Next</span><span class="mc-open">Open →</span></div>
+                </div>
+                <div class="mcard" data-go="workorders" data-ph="next" data-name="work orders jobs status" style="--a:var(--blue)">
+                  <div class="mc-top"><span class="mc-ic"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg></span></div>
+                  <h4>Work Orders</h4><p>Service details, status, before/after, est. vs actual</p>
+                  <div class="mc-foot"><span class="ph ph-next">Next</span><span class="mc-open">Open →</span></div>
+                </div>
+                <div class="mcard" data-go="inventory" data-ph="later" data-name="inventory supplies stock materials" style="--a:var(--orange)">
+                  <div class="mc-top"><span class="mc-ic"><svg viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="M3 8l9 5 9-5"/></svg></span><span class="mc-rank">P6</span></div>
+                  <h4>Inventory &amp; Supplies</h4><p>Products, equipment, reorder alerts, consumption</p>
+                  <div class="mc-foot"><span class="ph ph-later">Roadmap</span><span class="mc-open">Open →</span></div>
+                </div>
+                <div class="mcard" data-go="procurement" data-ph="later" data-name="procurement vendors suppliers purchase orders" style="--a:var(--purple)">
+                  <div class="mc-top"><span class="mc-ic"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.5 3H5l2.7 12.4a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.6L21 7H6"/></svg></span></div>
+                  <h4>Procurement &amp; Vendors</h4><p>Suppliers, purchase orders, expense approval</p>
+                  <div class="mc-foot"><span class="ph ph-later">Roadmap</span><span class="mc-open">Open →</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- CUSTOMERS -->
+            <div class="lgroup" data-layer="customers">
+              <div class="lgroup-head"><span class="lgl">Customers</span><span class="lgc">4 modules</span><span class="line"></span></div>
+              <div class="mgrid">
+                <div class="mcard" data-go="customers" data-ph="next" data-name="customer management leads churn" style="--a:var(--teal)">
+                  <div class="mc-top"><span class="mc-ic"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg></span><span class="mc-rank">P4</span></div>
+                  <h4>Customer Management</h4><p>Profiles, history, leads with source, churn signals</p>
+                  <div class="mc-foot"><span class="ph ph-next">Next</span><span class="mc-open">Open →</span></div>
+                </div>
+                <div class="mcard" data-go="sales" data-ph="later" data-name="sales quotation quotes pricing" style="--a:var(--amber)">
+                  <div class="mc-top"><span class="mc-ic"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></span></div>
+                  <h4>Sales &amp; Quotation</h4><p>Quote-to-job, pricing calculator, packages</p>
+                  <div class="mc-foot"><span class="ph ph-later">Roadmap</span><span class="mc-open">Open →</span></div>
+                </div>
+                <div class="mcard" data-go="communication" data-ph="later" data-name="communication messages reminders feedback" style="--a:var(--purple)">
+                  <div class="mc-top"><span class="mc-ic"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span></div>
+                  <h4>Customer Communication</h4><p>Confirmations, reminders, feedback channel</p>
+                  <div class="mc-foot"><span class="ph ph-later">Roadmap</span><span class="mc-open">Open →</span></div>
+                </div>
+                <div class="mcard" data-go="quality" data-ph="later" data-name="quality compliance complaints checklists" style="--a:var(--red)">
+                  <div class="mc-top"><span class="mc-ic"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></span></div>
+                  <h4>Quality &amp; Compliance</h4><p>Complaints, inspections, the service guarantee</p>
+                  <div class="mc-foot"><span class="ph ph-later">Roadmap</span><span class="mc-open">Open →</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- PEOPLE -->
+            <div class="lgroup" data-layer="people">
+              <div class="lgroup-head"><span class="lgl">People</span><span class="lgc">2 modules</span><span class="line"></span></div>
+              <div class="mgrid">
+                <div class="mcard" data-go="workforce" data-ph="later" data-name="workforce employees skills attendance" style="--a:var(--teal)">
+                  <div class="mc-top"><span class="mc-ic"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg></span></div>
+                  <h4>Workforce Management</h4><p>Availability, skills, attendance, productivity</p>
+                  <div class="mc-foot"><span class="ph ph-later">Roadmap</span><span class="mc-open">Open →</span></div>
+                </div>
+                <div class="mcard" data-go="payroll" data-ph="now" data-name="payroll time tracking timesheets bonuses" style="--a:var(--green)">
+                  <div class="mc-top"><span class="mc-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><span class="mc-rank">P2</span></div>
+                  <h4>Payroll &amp; Time Tracking</h4><p>Dual pay regime, material hours, bonuses as cost</p>
+                  <div class="mc-foot"><span class="ph ph-now">Live now</span><span class="mc-open">Open →</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- FINANCE -->
+            <div class="lgroup" data-layer="finance">
+              <div class="lgroup-head"><span class="lgl">Finance</span><span class="lgc">2 modules</span><span class="line"></span></div>
+              <div class="mgrid">
+                <div class="mcard" data-go="finance" data-ph="now" data-name="finance accounting invoicing receivables raise" style="--a:var(--green)">
+                  <div class="mc-top"><span class="mc-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M14.5 9.5a2.5 2 0 0 0-2.5-1.5c-1.4 0-2.5.7-2.5 1.8s1.1 1.5 2.5 1.9 2.5.8 2.5 1.9-1.1 1.8-2.5 1.8a2.5 2 0 0 1-2.5-1.5"/></svg></span><span class="mc-rank">P1</span></div>
+                  <h4>Finance &amp; Accounting</h4><p>Invoicing, receivables, the raise decision</p>
+                  <div class="mc-foot"><span class="ph ph-now">Live now</span><span class="mc-open">Open →</span></div>
+                </div>
+                <div class="mcard" data-go="bi" data-ph="now" data-name="business intelligence reporting revenue margin" style="--a:var(--blue)">
+                  <div class="mc-top"><span class="mc-ic"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6"/><rect x="12" y="8" width="3" height="10"/><rect x="17" y="4" width="3" height="14"/></svg></span><span class="mc-rank">P3</span></div>
+                  <h4>Business Intelligence</h4><p>The six reporting screens · revenue &amp; margin</p>
+                  <div class="mc-foot"><span class="ph ph-now">Live now</span><span class="mc-open">Open →</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="no-hit" id="noHit">No module matches your search.</div>
+        </div>
+      </section>
+
+      <!-- ========================================================= DASHBOARD -->
+      <section class="view active" id="view-dashboard">
+        <div class="page-head">
+          <div><h2>Good morning, Gabi 👋</h2><p>Tuesday, Aug 12 2026 · here's where TidyUp! stands this week.</p></div>
+          <div class="head-actions">
+            <button class="btn"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5M12 15V3"/></svg>Export</button>
+            <button class="btn primary"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>New job</button>
+          </div>
+        </div>
+
+        <div class="grid g4" style="margin-bottom:16px">
+          <div class="kpi"><div class="kico" style="background:var(--green)"><svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="klabel">Revenue · MTD</div><div class="kval">$74.3k</div><div class="kdelta up">▲ 12.4% vs last month</div></div>
+          <div class="kpi"><div class="kico" style="background:var(--blue)"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div><div class="klabel">Jobs this week</div><div class="kval">142</div><div class="kdelta up">▲ 9 vs last week</div></div>
+          <div class="kpi"><div class="kico" style="background:var(--navy)"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div><div class="klabel">Labor % of revenue</div><div class="kval">41.8%</div><div class="kdelta down">▲ 1.2 pts — watch</div></div>
+          <div class="kpi"><div class="kico" style="background:var(--cyan-ink)"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg></div><div class="klabel">Cash vs. floor</div><div class="kval">$38.1k</div><div class="kdelta up">▲ $13.1k over floor</div></div>
+        </div>
+
+        <div class="split" style="margin-bottom:16px">
+          <div class="card">
+            <div class="card-head"><div><h3>Revenue — this year vs. last year</h3><span class="sub">Monthly, all lines of business</span></div><span class="link">Open in BI ›</span></div>
+            <div class="card-pad chartbox">
+              <svg viewBox="0 0 640 210" style="width:100%;height:auto">
+                <defs><linearGradient id="rev" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#02CDFF" stop-opacity=".28"/><stop offset="1" stop-color="#02CDFF" stop-opacity="0"/></linearGradient></defs>
+                <line x1="40" y1="20" x2="40" y2="175" stroke="#e7eef3"/><line x1="40" y1="175" x2="620" y2="175" stroke="#e7eef3"/>
+                <g font-family="JetBrains Mono" font-size="9" fill="#9aa6b0">
+                  <text x="8" y="30">80k</text><text x="8" y="105">45k</text><text x="8" y="178">10k</text>
+                </g>
+                <g font-family="JetBrains Mono" font-size="9" fill="#9aa6b0" text-anchor="middle">
+                  <text x="80" y="192">Jan</text><text x="170" y="192">Mar</text><text x="270" y="192">May</text><text x="370" y="192">Jul</text><text x="470" y="192">Sep</text><text x="570" y="192">Nov</text>
+                </g>
+                <polyline fill="none" stroke="#cbd8e0" stroke-width="2" stroke-dasharray="4 4" points="55,140 110,133 165,128 220,120 275,118 330,110 385,108 440,104 495,100 550,96 605,92"/>
+                <polygon fill="url(#rev)" points="55,120 110,110 165,104 220,92 275,86 330,74 385,66 440,58 495,52,550,46 605,40 605,175 55,175"/>
+                <polyline fill="none" stroke="#01475D" stroke-width="2.6" points="55,120 110,110 165,104 220,92 275,86 330,74 385,66 440,58 495,52 550,46 605,40"/>
+                <circle cx="385" cy="66" r="4" fill="#02CDFF" stroke="#fff" stroke-width="2"/>
+              </svg>
+              <div class="legend-row"><span class="lg"><span class="sw" style="background:#01475D"></span>2026</span><span class="lg"><span class="sw" style="background:#cbd8e0"></span>2025</span><span class="lg" style="margin-left:auto;color:#1fa565;font-weight:600">Residential drives the gain</span></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><h3>Alerts</h3><span class="link">View all ›</span></div>
+            <div class="card-pad">
+              <div class="alert red">
+                <div class="aic"><svg viewBox="0 0 24 24"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg></div>
+                <div><h4>Customer complaint — The Reserve HOA</h4><p>Text received 8:12am. Quality bonus at risk for the period.</p></div><span class="at">14m</span>
+              </div>
+              <div class="alert amber">
+                <div class="aic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+                <div><h4>Crew B over allocated time</h4><p>Job #4471 (deep clean) at +38 min vs. estimate.</p></div><span class="at">just now</span>
+              </div>
+              <div class="alert blue">
+                <div class="aic"><svg viewBox="0 0 24 24"><path d="M4 4h16v12H5.2L4 17.5z"/></svg></div>
+                <div><h4>3 invoices past due &gt; 30 days</h4><p>$4,120 outstanding. Commercial net-60 accounts.</p></div><span class="at">1h</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid g3">
+          <div class="card">
+            <div class="card-head"><h3>Revenue by segment</h3><span class="sub">MTD</span></div>
+            <div class="card-pad">
+              <div class="hbars">
+                <div class="hbar"><span class="hl">Residential</span><div class="track"><div class="fill" style="width:76%"></div></div><span class="hv">$56.4k</span></div>
+                <div class="hbar"><span class="hl">Commercial</span><div class="track"><div class="fill" style="width:24%"></div></div><span class="hv">$13.8k</span></div>
+                <div class="hbar"><span class="hl">Construction · DR Horton</span><div class="track"><div class="fill" style="width:8%"></div></div><span class="hv">$4.1k</span></div>
+              </div>
+              <p class="note">Goal mix 60/40 — commercial is at 19% of the base. Gap to goal: 21 pts.</p>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>Today's operation</h3><span class="sub">Aug 12</span></div>
+            <div class="card-pad">
+              <div class="mini"><span>Jobs scheduled</span><b>18</b></div>
+              <div class="mini"><span>Completed</span><b style="color:var(--ok)">7</b></div>
+              <div class="mini"><span>In progress</span><b style="color:var(--blue)">4</b></div>
+              <div class="mini"><span>Running late</span><b style="color:var(--bad)">2</b></div>
+              <div class="mini"><span>Crews active</span><b>6 of 7</b></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>Community · Cleaning for a Reason</h3><span class="sub">This month</span></div>
+            <div class="card-pad">
+              <div class="mini"><span>Free cleanings delivered</span><b>1 of 2</b></div>
+              <div class="mini"><span>Crew hours contributed</span><b>6.5 h</b></div>
+              <div class="mini"><span>Contributed value (cost)</span><b>$310</b></div>
+              <div class="mini"><span>Classification</span><span class="badge b-purple">Excluded from margin</span></div>
+              <p class="note">Kept out of profitability so it never reads as a loss-making job.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================= SCHEDULING -->
+      <section class="view" id="view-scheduling">
+        <div class="page-head">
+          <div><h2>Scheduling &amp; Dispatch</h2><p>Tuesday, Aug 12 2026 · 18 jobs · 6 crews out</p></div>
+          <div class="head-actions">
+            <button class="btn"><svg viewBox="0 0 24 24"><path d="M8 2v4M16 2v4M3 10h18"/><rect x="3" y="4" width="18" height="18" rx="2"/></svg>Week view</button>
+            <button class="btn primary"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Schedule job</button>
+          </div>
+        </div>
+        <div class="pill-row">
+          <span class="fpill on">All crews</span><span class="fpill">Residential</span><span class="fpill">Commercial</span><span class="fpill">Construction</span><span class="fpill">Carpet &amp; tile</span>
+        </div>
+        <div class="card card-pad">
+          <div class="sched">
+            <div class="crew-row">
+              <div class="crew-tag"><span class="cd" style="background:var(--blue)"></span><div><b>Crew A</b><span>Maria R. · Luz H. · 🚗</span></div></div>
+              <div class="jobs">
+                <div class="job done"><span class="jt">08:00 · done</span><b>Standard clean</b><small>Whispering Oaks</small></div>
+                <div class="job done"><span class="jt">10:00 · done</span><b>Standard clean</b><small>Wadley Ave</small></div>
+                <div class="job"><span class="jt">13:00 · next</span><b>Deep clean</b><small>Green Tree Blvd</small></div>
+              </div>
+            </div>
+            <div class="crew-row">
+              <div class="crew-tag"><span class="cd" style="background:var(--teal)"></span><div><b>Crew B</b><span>Ana P. · Sofia G. · 🚗</span></div></div>
+              <div class="jobs">
+                <div class="job done"><span class="jt">08:30 · done</span><b>Move-out</b><small>Loma Linda</small></div>
+                <div class="job late"><span class="jt">11:00 · +38m</span><b>Deep clean</b><small>#4471 · The Reserve</small></div>
+                <div class="job"><span class="jt">14:30</span><b>Standard clean</b><small>Cuthbert Ave</small></div>
+              </div>
+            </div>
+            <div class="crew-row">
+              <div class="crew-tag"><span class="cd" style="background:var(--amber)"></span><div><b>Carpet van</b><span>Jose M. · 🚗</span></div></div>
+              <div class="jobs">
+                <div class="job done"><span class="jt">09:00 · done</span><b>Carpet + tile</b><small>Andrews Hwy office</small></div>
+                <div class="job"><span class="jt">13:30</span><b>Carpet cleaning</b><small>Sinclair Ave</small></div>
+              </div>
+            </div>
+            <div class="crew-row">
+              <div class="crew-tag"><span class="cd" style="background:var(--orange)"></span><div><b>Construction crew</b><span>DR Horton · Sup. Diego</span></div></div>
+              <div class="jobs">
+                <div class="job"><span class="jt">08:00–17:00</span><b>Post-construction</b><small>Legacy Ridge · 4 units</small></div>
+              </div>
+            </div>
+            <div class="crew-row">
+              <div class="crew-tag"><span class="cd" style="background:var(--purple)"></span><div><b>Crew C</b><span>Yamile C. · Karla D.</span></div></div>
+              <div class="jobs">
+                <div class="job"><span class="jt">10:00</span><b>Commercial</b><small>Midland Dental</small></div>
+                <div class="job"><span class="jt">15:00</span><b>Office cleaning</b><small>Big Sky CPA</small></div>
+              </div>
+            </div>
+          </div>
+          <p class="note">Scheduling objective: <b>equal hours across crews</b>, capped by vehicle availability (not every cleaner has a car). Built the day before — target is a week ahead.</p>
+        </div>
+      </section>
+
+      <!-- ========================================================= WORK ORDERS -->
+      <section class="view" id="view-workorders">
+        <div class="page-head"><div><h2>Work Orders</h2><p>All active and recent jobs · Housecall Pro sync</p></div>
+          <div class="head-actions"><button class="btn primary"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>New work order</button></div></div>
+        <div class="grid g4" style="margin-bottom:16px">
+          <div class="kpi"><div class="klabel">Scheduled</div><div class="kval">11</div></div>
+          <div class="kpi"><div class="klabel">In progress</div><div class="kval" style="color:var(--blue)">4</div></div>
+          <div class="kpi"><div class="klabel">Completed today</div><div class="kval" style="color:var(--ok)">7</div></div>
+          <div class="kpi"><div class="klabel">Cancelled / no-show</div><div class="kval" style="color:var(--bad)">2</div></div>
+        </div>
+        <div class="card">
+          <table class="tbl">
+            <thead><tr><th>Job</th><th>Customer</th><th>Service</th><th>Crew</th><th>Est. / Actual</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td><b>#4471</b></td><td>The Reserve HOA</td><td>Deep clean</td><td>Crew B</td><td class="num">3:00 / 3:38 ⚠</td><td><span class="badge b-amber"><span class="dotb" style="background:var(--amber)"></span>Over time</span></td></tr>
+              <tr><td><b>#4468</b></td><td>Green Tree Blvd</td><td>Standard</td><td>Crew A</td><td class="num">2:30 / —</td><td><span class="badge b-blue"><span class="dotb" style="background:var(--blue)"></span>In progress</span></td></tr>
+              <tr><td><b>#4465</b></td><td>Andrews Hwy Office</td><td>Carpet + tile</td><td>Carpet van</td><td class="num">2:00 / 1:52</td><td><span class="badge b-green"><span class="dotb" style="background:var(--ok)"></span>Completed</span></td></tr>
+              <tr><td><b>#4462</b></td><td>Loma Linda Dr</td><td>Move-out</td><td>Crew B</td><td class="num">4:00 / 4:05</td><td><span class="badge b-green"><span class="dotb" style="background:var(--ok)"></span>Completed</span></td></tr>
+              <tr><td><b>#4459</b></td><td>Sanchez Residence</td><td>Standard</td><td>—</td><td class="num">2:30 / —</td><td><span class="badge b-red"><span class="dotb" style="background:var(--bad)"></span>No-show (30m)</span></td></tr>
+              <tr><td><b>#4457</b></td><td>Legacy Ridge · Unit 12</td><td>Post-construction</td><td>Construction</td><td class="num">8:00 / —</td><td><span class="badge b-blue"><span class="dotb" style="background:var(--blue)"></span>In progress</span></td></tr>
+              <tr><td><b>#4454</b></td><td>Midland Dental</td><td>Commercial</td><td>Crew C</td><td class="num">1:30 / —</td><td><span class="badge b-gray">Scheduled</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note">Job clock is per job, not per person — one duration regardless of crew size. No-show reason is captured as a structured field (new in the hub).</p>
+      </section>
+
+      <!-- ========================================================= INVENTORY -->
+      <section class="view" id="view-inventory">
+        <div class="page-head"><div><h2>Inventory &amp; Supplies</h2><p>Cleaning products, equipment &amp; consumption</p></div>
+          <div class="head-actions"><button class="btn"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Add item</button><button class="btn primary">Create PO</button></div></div>
+        <div class="grid g4" style="margin-bottom:16px">
+          <div class="kpi"><div class="klabel">SKUs tracked</div><div class="kval">64</div></div>
+          <div class="kpi"><div class="klabel">Below reorder</div><div class="kval" style="color:var(--bad)">3</div></div>
+          <div class="kpi"><div class="klabel">Material spend · MTD</div><div class="kval">$2.9k</div></div>
+          <div class="kpi"><div class="klabel">Equipment items</div><div class="kval">12</div></div>
+        </div>
+        <div class="card">
+          <table class="tbl">
+            <thead><tr><th>Item</th><th>Category</th><th>On hand</th><th>Reorder at</th><th>Consumed / mo</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td><b>All-purpose cleaner (gal)</b></td><td>Chemical</td><td class="num">6</td><td class="num">8</td><td class="num">22</td><td><span class="badge b-red">Reorder</span></td></tr>
+              <tr><td><b>Microfiber cloths</b></td><td>Supply</td><td class="num">140</td><td class="num">80</td><td class="num">210</td><td><span class="badge b-green">OK</span></td></tr>
+              <tr><td><b>Disinfectant spray</b></td><td>Chemical</td><td class="num">9</td><td class="num">10</td><td class="num">31</td><td><span class="badge b-amber">Low</span></td></tr>
+              <tr><td><b>Carpet shampoo (gal)</b></td><td>Chemical</td><td class="num">3</td><td class="num">4</td><td class="num">7</td><td><span class="badge b-amber">Low</span></td></tr>
+              <tr><td><b>Vacuum — commercial</b></td><td>Equipment</td><td class="num">4</td><td class="num">—</td><td class="num">—</td><td><span class="badge b-blue">In service</span></td></tr>
+              <tr><td><b>Trash bags (case)</b></td><td>Supply</td><td class="num">2</td><td class="num">5</td><td class="num">14</td><td><span class="badge b-red">Reorder</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note">Consumption feeds the cost model — materials become an allocated indirect cost per job/team.</p>
+      </section>
+
+      <!-- ========================================================= PROCUREMENT -->
+      <section class="view" id="view-procurement">
+        <div class="page-head"><div><h2>Procurement &amp; Vendors</h2><p>Suppliers, purchase orders &amp; expense approval</p></div>
+          <div class="head-actions"><button class="btn primary"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>New PO</button></div></div>
+        <div class="split">
+          <div class="card">
+            <div class="card-head"><h3>Open purchase orders</h3><span class="sub">4 pending approval</span></div>
+            <table class="tbl">
+              <thead><tr><th>PO</th><th>Vendor</th><th>Amount</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td><b>PO-1042</b></td><td>Midland Janitorial Supply</td><td class="num">$860</td><td><span class="badge b-amber">Awaiting Junior</span></td></tr>
+                <tr><td><b>PO-1041</b></td><td>Chem-Pro Distributors</td><td class="num">$1,240</td><td><span class="badge b-green">Approved</span></td></tr>
+                <tr><td><b>PO-1039</b></td><td>Uline</td><td class="num">$395</td><td><span class="badge b-blue">Received</span></td></tr>
+                <tr><td><b>PO-1037</b></td><td>Costco Business</td><td class="num">$610</td><td><span class="badge b-green">Approved</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>Top vendors · 12 mo</h3></div>
+            <div class="card-pad">
+              <div class="hbars">
+                <div class="hbar"><span class="hl">Chem-Pro Dist.</span><div class="track"><div class="fill" style="width:88%"></div></div><span class="hv">$14.2k</span></div>
+                <div class="hbar"><span class="hl">Midland Janitorial</span><div class="track"><div class="fill" style="width:60%"></div></div><span class="hv">$9.6k</span></div>
+                <div class="hbar"><span class="hl">Uline</span><div class="track"><div class="fill" style="width:38%"></div></div><span class="hv">$6.1k</span></div>
+                <div class="hbar"><span class="hl">Costco Business</span><div class="track"><div class="fill" style="width:30%"></div></div><span class="hv">$4.8k</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================= CUSTOMERS -->
+      <section class="view" id="view-customers">
+        <div class="page-head"><div><h2>Customer Management</h2><p>412 active customers · Midland · Odessa · Greenwood</p></div>
+          <div class="head-actions"><button class="btn"><svg viewBox="0 0 24 24"><path d="M4 6h16M6 12h12M9 18h6"/></svg>Filter</button><button class="btn primary"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Add customer</button></div></div>
+        <div class="grid g4" style="margin-bottom:16px">
+          <div class="kpi"><div class="klabel">Active customers</div><div class="kval">412</div><div class="kdelta up">▲ 18 this month</div></div>
+          <div class="kpi"><div class="klabel">Recurring share</div><div class="kval">70%</div><div class="kdelta flat">mostly biweekly</div></div>
+          <div class="kpi"><div class="klabel">At risk (churn)</div><div class="kval" style="color:var(--bad)">9</div><div class="kdelta down">frequency dropping</div></div>
+          <div class="kpi"><div class="klabel">New leads · MTD</div><div class="kval">34</div><div class="kdelta up">from website form</div></div>
+        </div>
+        <div class="card">
+          <table class="tbl">
+            <thead><tr><th>Customer</th><th>Type</th><th>Frequency</th><th>Since</th><th>Lifetime value</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td><div class="who"><span class="av" style="background:var(--blue)">DH</span><b>DR Horton</b></div></td><td>Construction</td><td>Weekday crew</td><td>Mar 2026</td><td class="num">$61.4k</td><td><span class="badge b-green">Top account</span></td></tr>
+              <tr><td><div class="who"><span class="av" style="background:var(--teal)">RH</span><b>The Reserve HOA</b></div></td><td>Commercial</td><td>Weekly</td><td>2024</td><td class="num">$22.8k</td><td><span class="badge b-red">Complaint open</span></td></tr>
+              <tr><td><div class="who"><span class="av" style="background:var(--purple)">MD</span><b>Midland Dental</b></div></td><td>Commercial</td><td>Biweekly</td><td>2024</td><td class="num">$18.1k</td><td><span class="badge b-green">Active</span></td></tr>
+              <tr><td><div class="who"><span class="av" style="background:var(--amber)">GT</span><b>Green Tree Residence</b></div></td><td>Residential</td><td>Biweekly</td><td>2023</td><td class="num">$9.4k</td><td><span class="badge b-green">Active</span></td></tr>
+              <tr><td><div class="who"><span class="av" style="background:var(--orange)">SR</span><b>Sanchez Residence</b></div></td><td>Residential</td><td>Monthly</td><td>2025</td><td class="num">$2.1k</td><td><span class="badge b-amber">At risk</span></td></tr>
+              <tr><td><div class="who"><span class="av" style="background:var(--green)">BS</span><b>Big Sky CPA</b></div></td><td>Office</td><td>Weekly</td><td>2025</td><td class="num">$7.7k</td><td><span class="badge b-green">Active</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note">Lead source captured on the website form is now kept end-to-end (it used to be lost when re-keyed into Housecall Pro).</p>
+      </section>
+
+      <!-- ========================================================= SALES -->
+      <section class="view" id="view-sales">
+        <div class="page-head"><div><h2>Sales &amp; Quotation</h2><p>Estimate-to-cash pipeline · 48-hour response promise</p></div>
+          <div class="head-actions"><button class="btn primary"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>New quote</button></div></div>
+        <div class="grid g4" style="margin-bottom:16px">
+          <div class="kpi"><div class="klabel">Open quotes</div><div class="kval">27</div></div>
+          <div class="kpi"><div class="klabel">Conversion rate</div><div class="kval">61%</div><div class="kdelta up">≈ 6 in 10</div></div>
+          <div class="kpi"><div class="klabel">Avg. response time</div><div class="kval">31h</div><div class="kdelta up">under 48h target</div></div>
+          <div class="kpi"><div class="klabel">Pipeline value</div><div class="kval">$28.6k</div></div>
+        </div>
+        <div class="split">
+          <div class="card">
+            <div class="card-head"><h3>Recent quotes</h3></div>
+            <table class="tbl">
+              <thead><tr><th>Quote</th><th>Customer</th><th>Service</th><th>Value</th><th>Stage</th></tr></thead>
+              <tbody>
+                <tr><td><b>Q-2208</b></td><td>Cuthbert Ave</td><td>Deep clean</td><td class="num">$420</td><td><span class="badge b-blue">Sent</span></td></tr>
+                <tr><td><b>Q-2207</b></td><td>Permian Basin LLC</td><td>Office · recurring</td><td class="num">$1,180/mo</td><td><span class="badge b-amber">Follow-up</span></td></tr>
+                <tr><td><b>Q-2205</b></td><td>Wadley Ave</td><td>Move-in</td><td class="num">$360</td><td><span class="badge b-green">Won</span></td></tr>
+                <tr><td><b>Q-2203</b></td><td>Sinclair Residence</td><td>Carpet + tile</td><td class="num">$290</td><td><span class="badge b-green">Won</span></td></tr>
+                <tr><td><b>Q-2201</b></td><td>Loma Vista Office</td><td>Commercial</td><td class="num">$940/mo</td><td><span class="badge b-gray">Lost · price</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>Pricing calculator</h3><span class="sub">New</span></div>
+            <div class="card-pad">
+              <div class="mini"><span>Property size</span><b>2,400 sq ft</b></div>
+              <div class="mini"><span>Service</span><b>Standard clean</b></div>
+              <div class="mini"><span>Crew &amp; hours</span><b>2 people · 2.5h</b></div>
+              <div class="mini"><span>Est. labor cost</span><b>$118</b></div>
+              <div class="mini"><span>Materials + overhead</span><b>$34</b></div>
+              <div class="mini"><span>Suggested price</span><b style="color:var(--ok)">$205</b></div>
+              <div class="mini"><span>Est. margin</span><span class="badge b-green">26%</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================= COMMUNICATION -->
+      <section class="view" id="view-communication">
+        <div class="page-head"><div><h2>Customer Communication</h2><p>Confirmations, reminders &amp; feedback in one place</p></div>
+          <div class="head-actions"><button class="btn primary"><svg viewBox="0 0 24 24"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/></svg>New message</button></div></div>
+        <div class="grid g4" style="margin-bottom:16px">
+          <div class="kpi"><div class="klabel">Confirmations sent</div><div class="kval">18</div></div>
+          <div class="kpi"><div class="klabel">Reminders queued</div><div class="kval">24</div></div>
+          <div class="kpi"><div class="klabel">Unread replies</div><div class="kval" style="color:var(--blue)">5</div></div>
+          <div class="kpi"><div class="klabel">Review requests</div><div class="kval">7</div></div>
+        </div>
+        <div class="card">
+          <table class="tbl">
+            <thead><tr><th>Customer</th><th>Channel</th><th>Message</th><th>Type</th><th>When</th></tr></thead>
+            <tbody>
+              <tr><td><b>The Reserve HOA</b></td><td><span class="badge b-blue">SMS</span></td><td>"The bathrooms weren't done to standard today…"</td><td><span class="badge b-red">Complaint</span></td><td>8:12am</td></tr>
+              <tr><td><b>Green Tree Blvd</b></td><td><span class="badge b-blue">SMS</span></td><td>"Confirmed for 1pm, thank you!"</td><td><span class="badge b-green">Confirmation</span></td><td>7:40am</td></tr>
+              <tr><td><b>Sanchez Residence</b></td><td><span class="badge b-gray">Email</span></td><td>Reminder — appointment tomorrow 10am</td><td><span class="badge b-cyan">Reminder</span></td><td>Yesterday</td></tr>
+              <tr><td><b>Wadley Ave</b></td><td><span class="badge b-blue">SMS</span></td><td>Review request sent after cleaning</td><td><span class="badge b-purple">Review</span></td><td>Yesterday</td></tr>
+              <tr><td><b>Midland Dental</b></td><td><span class="badge b-gray">Email</span></td><td>"Can we move Friday to the afternoon?"</td><td><span class="badge b-amber">Reschedule</span></td><td>2h ago</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note">A dedicated feedback channel gives customers a freer place to flag issues before they become public reviews.</p>
+      </section>
+
+      <!-- ========================================================= QUALITY -->
+      <section class="view" id="view-quality">
+        <div class="page-head"><div><h2>Quality &amp; Compliance</h2><p>Complaints, inspections &amp; the service guarantee</p></div></div>
+        <div class="grid g4" style="margin-bottom:16px">
+          <div class="kpi"><div class="klabel">Open complaints</div><div class="kval" style="color:var(--bad)">1</div></div>
+          <div class="kpi"><div class="klabel">Resolved · MTD</div><div class="kval" style="color:var(--ok)">6</div></div>
+          <div class="kpi"><div class="klabel">Quality bonus status</div><div class="kval" style="font-size:18px;color:var(--bad)">At risk</div></div>
+          <div class="kpi"><div class="klabel">Breakage incidents</div><div class="kval">0</div></div>
+        </div>
+        <div class="split">
+          <div class="card">
+            <div class="card-head"><h3>Complaint log</h3><span class="sub">Drives the collective quality bonus</span></div>
+            <table class="tbl">
+              <thead><tr><th>Date</th><th>Customer</th><th>Issue</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td>Aug 12</td><td>The Reserve HOA</td><td>Bathrooms below standard</td><td><span class="badge b-red">Open</span></td></tr>
+                <tr><td>Aug 06</td><td>Loma Linda Dr</td><td>Missed baseboards</td><td><span class="badge b-green">Resolved</span></td></tr>
+                <tr><td>Aug 01</td><td>Andrews Hwy</td><td>Late arrival</td><td><span class="badge b-green">Resolved</span></td></tr>
+                <tr><td>Jul 28</td><td>Sinclair Ave</td><td>Streaked windows</td><td><span class="badge b-green">Resolved</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>Checklists &amp; inspections</h3></div>
+            <div class="card-pad">
+              <div class="mini"><span>Standard clean checklist</span><span class="badge b-green">Active</span></div>
+              <div class="mini"><span>Deep clean checklist</span><span class="badge b-green">Active</span></div>
+              <div class="mini"><span>Post-construction checklist</span><span class="badge b-green">Active</span></div>
+              <div class="mini"><span>Random inspections · MTD</span><b>12</b></div>
+              <div class="mini"><span>Pass rate</span><b style="color:var(--ok)">94%</b></div>
+              <p class="note">"Guaranteed" is a public promise — a complaint is the guarantee being called in, so it strips the team bonus for the period.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================= WORKFORCE -->
+      <section class="view" id="view-workforce">
+        <div class="page-head"><div><h2>Workforce Management</h2><p>28 employees · stable core + construction crew</p></div>
+          <div class="head-actions"><button class="btn primary"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Add employee</button></div></div>
+        <div class="grid g4" style="margin-bottom:16px">
+          <div class="kpi"><div class="klabel">Total employees</div><div class="kval">28</div></div>
+          <div class="kpi"><div class="klabel">Stable core (2y+)</div><div class="kval">15</div></div>
+          <div class="kpi"><div class="klabel">Construction crew</div><div class="kval">13</div><div class="kdelta flat">high churn / tryout</div></div>
+          <div class="kpi"><div class="klabel">With a vehicle</div><div class="kval">9</div><div class="kdelta down">scheduling constraint</div></div>
+        </div>
+        <div class="card">
+          <table class="tbl">
+            <thead><tr><th>Employee</th><th>Role</th><th>Group</th><th>Hours / wk</th><th>Attendance</th><th>Certifications</th></tr></thead>
+            <tbody>
+              <tr><td><div class="who"><span class="av" style="background:var(--blue)">MR</span><b>Maria Rojas</b></div></td><td>Lead cleaner</td><td><span class="badge b-green">Core</span></td><td class="num">38</td><td><span class="badge b-green">98%</span></td><td>Deep clean · Carpet</td></tr>
+              <tr><td><div class="who"><span class="av" style="background:var(--teal)">AP</span><b>Ana Perez</b></div></td><td>Cleaner</td><td><span class="badge b-green">Core</span></td><td class="num">36</td><td><span class="badge b-green">95%</span></td><td>Standard</td></tr>
+              <tr><td><div class="who"><span class="av" style="background:var(--purple)">YC</span><b>Yamile Castro</b></div></td><td>Cleaner · driver</td><td><span class="badge b-green">Core</span></td><td class="num">40</td><td><span class="badge b-amber">88%</span></td><td>Commercial</td></tr>
+              <tr><td><div class="who"><span class="av" style="background:var(--orange)">DG</span><b>Diego Gómez</b></div></td><td>Supervisor</td><td><span class="badge b-blue">Construction</span></td><td class="num">45</td><td><span class="badge b-green">100%</span></td><td>Post-construction</td></tr>
+              <tr><td><div class="who"><span class="av" style="background:var(--amber)">JM</span><b>Jose Martín</b></div></td><td>Carpet tech</td><td><span class="badge b-green">Core</span></td><td class="num">34</td><td><span class="badge b-green">96%</span></td><td>Carpet · Tile</td></tr>
+              <tr><td><div class="who"><span class="av" style="background:var(--red)">NN</span><b>New hire · trial</b></div></td><td>Cleaner</td><td><span class="badge b-blue">Construction</span></td><td class="num">16</td><td><span class="badge b-gray">Day 2</span></td><td>—</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note">Core and construction populations are tracked separately — construction "leavers" read a tryout funnel, not retention.</p>
+      </section>
+
+      <!-- ========================================================= PAYROLL -->
+      <section class="view" id="view-payroll">
+        <div class="page-head"><div><h2>Payroll &amp; Time Tracking</h2><p>Pay period Aug 4 – Aug 17 · biweekly</p></div>
+          <div class="head-actions"><button class="btn"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/></svg>Export to QuickBooks</button><button class="btn primary">Run payroll</button></div></div>
+        <div class="seg" id="payseg">
+          <button class="on" data-pt="hours">Timesheets</button><button data-pt="bonus">Bonuses</button>
+        </div>
+        <div class="grid g4" style="margin-bottom:16px">
+          <div class="kpi"><div class="klabel">Paid hours · period</div><div class="kval">1,684</div></div>
+          <div class="kpi"><div class="klabel">Material hours</div><div class="kval">96</div><div class="kdelta flat">separate category</div></div>
+          <div class="kpi"><div class="klabel">Overtime hours</div><div class="kval" style="color:var(--amber)">42</div></div>
+          <div class="kpi"><div class="klabel">Est. labor cost</div><div class="kval">$31.1k</div></div>
+        </div>
+        <div class="card" id="pt-hours">
+          <div class="card-head"><h3>Timesheets — dual pay regime</h3><span class="sub">Payroll group paid max(scheduled, actual) · off-payroll paid actual</span></div>
+          <table class="tbl">
+            <thead><tr><th>Employee</th><th>Regime</th><th>Scheduled</th><th>Actual</th><th>Material</th><th>Paid hours</th><th>Benefits</th></tr></thead>
+            <tbody>
+              <tr><td><b>Maria Rojas</b></td><td><span class="badge b-green">Payroll</span></td><td class="num">76.0</td><td class="num">72.5</td><td class="num">3.0</td><td class="num"><b>79.0</b></td><td><span class="badge b-green">Yes</span></td></tr>
+              <tr><td><b>Ana Perez</b></td><td><span class="badge b-green">Payroll</span></td><td class="num">72.0</td><td class="num">78.5</td><td class="num">2.5</td><td class="num"><b>81.0</b></td><td><span class="badge b-green">Yes</span></td></tr>
+              <tr><td><b>Yamile Castro</b></td><td><span class="badge b-green">Payroll</span></td><td class="num">80.0</td><td class="num">80.0</td><td class="num">4.0</td><td class="num"><b>84.0</b></td><td><span class="badge b-green">Yes</span></td></tr>
+              <tr><td><b>Off-payroll · worker</b></td><td><span class="badge b-amber">Off-payroll</span></td><td class="num">—</td><td class="num">74.0</td><td class="num">1.5</td><td class="num"><b>75.5</b></td><td><span class="badge b-gray">No</span></td></tr>
+              <tr><td><b>Jose Martín</b></td><td><span class="badge b-green">Payroll</span></td><td class="num">68.0</td><td class="num">66.0</td><td class="num">1.0</td><td class="num"><b>69.0</b></td><td><span class="badge b-green">Yes</span></td></tr>
+            </tbody>
+          </table>
+          <p class="note" style="padding:0 18px 14px">Payroll group: finishing early is still paid in full; overruns add the excess. Loaded cost differs by group — burden is a per-population parameter, not a company constant.</p>
+        </div>
+        <div class="card" id="pt-bonus" style="display:none">
+          <div class="card-head"><h3>Bonuses — biweekly</h3><span class="sub">Now tracked as a real cost</span></div>
+          <table class="tbl">
+            <thead><tr><th>Bonus</th><th>Type</th><th>Eligible</th><th>Lost this period</th><th>Reason</th><th>Cost</th></tr></thead>
+            <tbody>
+              <tr><td><b>Quality bonus</b></td><td><span class="badge b-blue">Collective</span></td><td>Whole team</td><td><span class="badge b-red">Yes</span></td><td>Complaint — The Reserve HOA</td><td class="num">$0</td></tr>
+              <tr><td><b>Breakage bonus</b></td><td><span class="badge b-purple">Individual</span></td><td>26 of 28</td><td><span class="badge b-green">Paid</span></td><td>No breakage</td><td class="num">$1,300</td></tr>
+            </tbody>
+          </table>
+          <p class="note" style="padding:0 18px 14px">One complaint removes the collective quality bonus from the whole team for the period — links complaint → period → individuals.</p>
+        </div>
+      </section>
+
+      <!-- ========================================================= FINANCE -->
+      <section class="view" id="view-finance">
+        <div class="page-head"><div><h2>Finance &amp; Accounting</h2><p>Invoicing, receivables &amp; the raise decision · QuickBooks sync</p></div>
+          <div class="head-actions"><button class="btn"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/></svg>Statements</button><button class="btn primary"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>New invoice</button></div></div>
+        <div class="grid g4" style="margin-bottom:16px">
+          <div class="kpi"><div class="kico" style="background:var(--green)"><svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="klabel">Revenue · MTD</div><div class="kval">$74.3k</div><div class="kdelta up">▲ 12.4%</div></div>
+          <div class="kpi"><div class="kico" style="background:var(--red)"><svg viewBox="0 0 24 24"><path d="M4 4h16v12H5.2L4 17.5z"/></svg></div><div class="klabel">Open receivables</div><div class="kval">$18.9k</div><div class="kdelta down">$4.1k over 60d</div></div>
+          <div class="kpi"><div class="kico" style="background:var(--navy)"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div><div class="klabel">Operating profit</div><div class="kval">$21.4k</div><div class="kdelta up">28.8% margin</div></div>
+          <div class="kpi"><div class="kico" style="background:var(--cyan-ink)"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg></div><div class="klabel">Cash vs. floor</div><div class="kval">$38.1k</div><div class="kdelta up">floor $25k</div></div>
+        </div>
+
+        <div class="split" style="margin-bottom:16px">
+          <div class="card">
+            <div class="card-head"><div><h3>Can we afford a raise?</h3><span class="sub">Monthly operating profit by raise scenario</span></div><span class="badge b-cyan">Decision model</span></div>
+            <div class="card-pad">
+              <div class="bars">
+                <div class="bar-col"><div class="bar" style="height:88%"></div><span class="bl">0%</span></div>
+                <div class="bar-col"><div class="bar" style="height:74%"></div><span class="bl">+3%</span></div>
+                <div class="bar-col"><div class="bar" style="height:60%"></div><span class="bl">+5%</span></div>
+                <div class="bar-col"><div class="bar" style="height:44%"></div><span class="bl">+8%</span></div>
+                <div class="bar-col"><div class="bar g2" style="height:26%"></div><span class="bl">+10%</span></div>
+                <div class="bar-col"><div class="bar g2" style="height:12%"></div><span class="bl">+12%</span></div>
+              </div>
+              <p class="note">Break-even holds through <b>+8%</b> ($17.9k profit). At +10% margin thins to $11.2k; +12% drops below the comfort line.</p>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>Where the money goes</h3><span class="sub">Monthly average</span></div>
+            <div class="card-pad">
+              <div class="hbars">
+                <div class="hbar"><span class="hl">Labor</span><div class="track"><div class="fill" style="width:100%;background:linear-gradient(90deg,#01475D,#0a86a8)"></div></div><span class="hv">42¢</span></div>
+                <div class="hbar"><span class="hl">Office + utilities</span><div class="track"><div class="fill" style="width:26%"></div></div><span class="hv">11¢</span></div>
+                <div class="hbar"><span class="hl">Materials</span><div class="track"><div class="fill" style="width:18%"></div></div><span class="hv">8¢</span></div>
+                <div class="hbar"><span class="hl">Van + fuel</span><div class="track"><div class="fill" style="width:14%"></div></div><span class="hv">6¢</span></div>
+                <div class="hbar"><span class="hl">Overhead</span><div class="track"><div class="fill" style="width:12%"></div></div><span class="hv">5¢</span></div>
+              </div>
+              <p class="note">Per dollar of revenue. Labor now includes off-payroll workers (previously hidden as owner's draw).</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>Receivables — aging</h3><span class="sub">Call order for the finance coordinator</span></div>
+          <table class="tbl">
+            <thead><tr><th>Customer</th><th>Invoice</th><th>Terms</th><th>Amount</th><th>Days late</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td><b>Permian Basin LLC</b></td><td>INV-3391</td><td>Net 60</td><td class="num">$2,140</td><td class="num">72</td><td><span class="badge b-red">Over 60d</span></td></tr>
+              <tr><td><b>Loma Vista Office</b></td><td>INV-3402</td><td>Net 30</td><td class="num">$1,980</td><td class="num">41</td><td><span class="badge b-amber">Over 30d</span></td></tr>
+              <tr><td><b>Midland Dental</b></td><td>INV-3418</td><td>Net 30</td><td class="num">$1,240</td><td class="num">12</td><td><span class="badge b-blue">Current</span></td></tr>
+              <tr><td><b>Sanchez Residence</b></td><td>INV-3421</td><td>On completion</td><td class="num">$210</td><td class="num">3</td><td><span class="badge b-amber">Card charge due</span></td></tr>
+              <tr><td><b>DR Horton</b></td><td>INV-3399</td><td>Portal · Net 30</td><td class="num">$8,200</td><td class="num">8</td><td><span class="badge b-blue">Submitted</span></td></tr>
+            </tbody>
+          </table>
+          <p class="note" style="padding:0 18px 14px">Card on file auto-charges after 3 days for residential. DR Horton is billed through the customer's own portal.</p>
+        </div>
+      </section>
+
+      <!-- ========================================================= BI -->
+      <section class="view" id="view-bi">
+        <div class="page-head"><div><h2>Business Intelligence</h2><p>Six reporting screens · one central hub</p></div>
+          <div class="head-actions"><button class="btn"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/></svg>Export PDF</button></div></div>
+        <div class="grid g3" style="margin-bottom:16px">
+          <div class="card card-pad" style="border-left:3px solid var(--navy)"><div class="mono" style="font-size:10px;color:var(--cyan-ink);letter-spacing:.1em">01 · WEEKLY · OWNERS</div><h3 style="font-size:15px;margin:6px 0 4px">Overview</h3><p style="font-size:12px;color:var(--muted)">Are we growing profitably?</p></div>
+          <div class="card card-pad" style="border-left:3px solid var(--green)"><div class="mono" style="font-size:10px;color:var(--cyan-ink);letter-spacing:.1em">02 · MONTHLY · FINANCE</div><h3 style="font-size:15px;margin:6px 0 4px">Profitability</h3><p style="font-size:12px;color:var(--muted)">Can we afford a raise?</p></div>
+          <div class="card card-pad" style="border-left:3px solid var(--cyan)"><div class="mono" style="font-size:10px;color:var(--cyan-ink);letter-spacing:.1em">03 · WEEKLY · FINANCE</div><h3 style="font-size:15px;margin:6px 0 4px">Cash</h3><p style="font-size:12px;color:var(--muted)">Will we have enough?</p></div>
+          <div class="card card-pad" style="border-left:3px solid var(--amber)"><div class="mono" style="font-size:10px;color:var(--cyan-ink);letter-spacing:.1em">04 · DAILY · ADMIN</div><h3 style="font-size:15px;margin:6px 0 4px">Operations</h3><p style="font-size:12px;color:var(--muted)">Will the schedule hold?</p></div>
+          <div class="card card-pad" style="border-left:3px solid var(--purple)"><div class="mono" style="font-size:10px;color:var(--cyan-ink);letter-spacing:.1em">05 · WEEKLY · SUPERVISORS</div><h3 style="font-size:15px;margin:6px 0 4px">Crews</h3><p style="font-size:12px;color:var(--muted)">Who delivers, at what quality?</p></div>
+          <div class="card card-pad" style="border-left:3px solid var(--orange)"><div class="mono" style="font-size:10px;color:var(--cyan-ink);letter-spacing:.1em">06 · MONTHLY · OWNERS</div><h3 style="font-size:15px;margin:6px 0 4px">Customers</h3><p style="font-size:12px;color:var(--muted)">Where does revenue come from?</p></div>
+        </div>
+        <div class="split">
+          <div class="card">
+            <div class="card-head"><h3>Revenue per cleaner · last 30 days</h3><span class="sub">Client's #1 requested breakdown</span></div>
+            <div class="card-pad">
+              <div class="hbars">
+                <div class="hbar"><span class="hl">Maria Rojas</span><div class="track"><div class="fill" style="width:100%"></div></div><span class="hv">$8.9k</span></div>
+                <div class="hbar"><span class="hl">Yamile Castro</span><div class="track"><div class="fill" style="width:86%"></div></div><span class="hv">$7.6k</span></div>
+                <div class="hbar"><span class="hl">Ana Perez</span><div class="track"><div class="fill" style="width:74%"></div></div><span class="hv">$6.5k</span></div>
+                <div class="hbar"><span class="hl">Jose Martín</span><div class="track"><div class="fill" style="width:62%"></div></div><span class="hv">$5.4k</span></div>
+              </div>
+              <p class="note">Always paired with quality — productivity is never read on its own.</p>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>Margin by service line</h3><span class="sub">After labor &amp; materials</span></div>
+            <div class="card-pad">
+              <div class="hbars">
+                <div class="hbar"><span class="hl">Carpet &amp; tile</span><div class="track"><div class="fill" style="width:88%;background:linear-gradient(90deg,#1fa565,#7fd6b0)"></div></div><span class="hv">34%</span></div>
+                <div class="hbar"><span class="hl">Residential deep</span><div class="track"><div class="fill" style="width:74%;background:linear-gradient(90deg,#1fa565,#7fd6b0)"></div></div><span class="hv">29%</span></div>
+                <div class="hbar"><span class="hl">Residential std</span><div class="track"><div class="fill" style="width:64%;background:linear-gradient(90deg,#1fa565,#7fd6b0)"></div></div><span class="hv">25%</span></div>
+                <div class="hbar"><span class="hl">Construction</span><div class="track"><div class="fill" style="width:44%;background:linear-gradient(90deg,#eaa61b,#f3d07f)"></div></div><span class="hv">17%</span></div>
+                <div class="hbar"><span class="hl">Commercial (old rates)</span><div class="track"><div class="fill" style="width:22%;background:linear-gradient(90deg,#ef4553,#f7a3ab)"></div></div><span class="hv">9%</span></div>
+              </div>
+              <p class="note">Confirms the suspicion: older commercial rates barely clear cost.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<!-- ============ NOTIFICATIONS DROPDOWN ============ -->
+<div class="dd" id="notifDD">
+  <div class="dd-head"><h4>Notifications</h4><span id="notifClear">Mark all read</span></div>
+  <div id="notifList">
+    <div class="dd-item" data-go="quality"><span class="dd-dot" style="background:var(--red)"></span><div><h5>Customer complaint — The Reserve HOA</h5><p>Quality bonus at risk for the period.</p></div><span class="tm">14m</span></div>
+    <div class="dd-item" data-go="scheduling"><span class="dd-dot" style="background:var(--amber)"></span><div><h5>Crew B over allocated time</h5><p>Job #4471 at +38 min vs. estimate.</p></div><span class="tm">now</span></div>
+    <div class="dd-item" data-go="finance"><span class="dd-dot" style="background:var(--blue)"></span><div><h5>3 invoices past due &gt; 30 days</h5><p>$4,120 outstanding.</p></div><span class="tm">1h</span></div>
+  </div>
+</div>
+
+<!-- ============ MODAL ============ -->
+<div class="ov" id="modalOv">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-head">
+      <div class="mh-ic"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div>
+      <div><h3 id="modalTitle">New record</h3><p id="modalSub">Fill in the details below</p></div>
+      <div class="modal-x" id="modalClose"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></div>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-foot">
+      <button class="btn" id="modalCancel">Cancel</button>
+      <button class="btn primary" id="modalSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ TOASTS ============ -->
+<div id="toastWrap"></div>
+
+<script>
+  // ---- stage control (login → hub → app) ----
+  function showStage(s){
+    document.body.className = 'stage-' + s;
+    window.scrollTo(0,0);
+  }
+
+  // ---- login ----
+  var loginForm = document.getElementById('loginForm');
+  var loginBtn = document.getElementById('loginBtn');
+  var loginEmail = document.getElementById('loginEmail');
+  function doLogin(e){
+    if(e) e.preventDefault();
+    var okE = loginEmail.value.trim() !== '' && loginEmail.value.indexOf('@') > -1;
+    var okP = loginPass.value.trim() !== '';
+    loginEmail.parentElement.classList.toggle('err', !okE);
+    loginPass.parentElement.classList.toggle('err', !okP);
+    if(!okE || !okP){
+      loginBtn.classList.remove('shake'); void loginBtn.offsetWidth; loginBtn.classList.add('shake');
+      return;
+    }
+    showStage('hub');
+  }
+  if(loginForm) loginForm.addEventListener('submit', doLogin);
+  if(loginBtn) loginBtn.addEventListener('click', doLogin);
+  var eyeToggle = document.getElementById('eyeToggle');
+  var loginPass = document.getElementById('loginPass');
+  eyeToggle.addEventListener('click', function(){
+    loginPass.type = loginPass.type === 'password' ? 'text' : 'password';
+    eyeToggle.style.stroke = loginPass.type === 'text' ? 'var(--cyan-ink)' : 'var(--muted)';
+  });
+  document.getElementById('logoutHub').addEventListener('click', function(){ showStage('login'); });
+
+  // ---- in-app navigation ----
+  var navItems = document.querySelectorAll('.nav-item');
+  var launchBtn = document.querySelector('.launch-btn');
+  var views = document.querySelectorAll('.view');
+  var tbTitle = document.getElementById('tbTitle');
+  var tbCrumb = document.getElementById('tbCrumb');
+  var canvas = document.querySelector('.canvas');
+
+  function go(view){
+    var src = document.querySelector('.nav-item[data-view="'+view+'"]');
+    views.forEach(function(s){s.classList.remove('active');});
+    var target = document.getElementById('view-'+view);
+    if(target) target.classList.add('active');
+    navItems.forEach(function(x){x.classList.remove('active');});
+    if(src){ src.classList.add('active'); tbTitle.innerHTML = src.getAttribute('data-title'); tbCrumb.textContent = src.getAttribute('data-crumb'); }
+    if(canvas) canvas.scrollTop = 0;
+  }
+
+  navItems.forEach(function(it){ it.addEventListener('click', function(){ go(it.getAttribute('data-view')); }); });
+  // "All Modules" returns to the independent hub selector
+  launchBtn.addEventListener('click', function(){ showStage('hub'); });
+
+  // ---- hub module cards → open that module inside the app ----
+  document.querySelectorAll('.mcard').forEach(function(c){
+    c.addEventListener('click', function(){ showStage('app'); go(c.getAttribute('data-go')); });
+  });
+
+  // ---- sidebar collapse ----
+  var collapseBtn = document.getElementById('collapseBtn');
+  var app = document.querySelector('.app');
+  collapseBtn.addEventListener('click', function(){ app.classList.toggle('rail'); });
+
+  // ---- module search + phase filter ----
+  var modSearch = document.getElementById('modSearch');
+  var phaseFilter = document.getElementById('phaseFilter');
+  var noHit = document.getElementById('noHit');
+  var curPhase = 'all';
+
+  function filterMods(){
+    var q = (modSearch.value || '').toLowerCase().trim();
+    var anyHit = false;
+    document.querySelectorAll('.lgroup').forEach(function(g){
+      var groupHit = false;
+      g.querySelectorAll('.mcard').forEach(function(c){
+        var okText = !q || (c.getAttribute('data-name')+' '+c.querySelector('h4').textContent).toLowerCase().indexOf(q) > -1;
+        var okPhase = curPhase==='all' || c.getAttribute('data-ph')===curPhase;
+        var show = okText && okPhase;
+        c.classList.toggle('hide', !show);
+        if(show){ groupHit = true; anyHit = true; }
+      });
+      g.style.display = groupHit ? '' : 'none';
+    });
+    noHit.style.display = anyHit ? 'none' : 'block';
+  }
+  modSearch.addEventListener('input', filterMods);
+  phaseFilter.querySelectorAll('.fpill').forEach(function(p){
+    p.addEventListener('click', function(){
+      phaseFilter.querySelectorAll('.fpill').forEach(function(x){x.classList.remove('on');});
+      p.classList.add('on');
+      curPhase = p.getAttribute('data-ph');
+      filterMods();
+    });
+  });
+
+  // ---- payroll sub-tabs ----
+  var payseg = document.getElementById('payseg');
+  if(payseg){
+    payseg.querySelectorAll('button').forEach(function(b){
+      b.addEventListener('click', function(){
+        payseg.querySelectorAll('button').forEach(function(x){x.classList.remove('on');});
+        b.classList.add('on');
+        var pt = b.getAttribute('data-pt');
+        document.getElementById('pt-hours').style.display = pt==='hours'?'':'none';
+        document.getElementById('pt-bonus').style.display = pt==='bonus'?'':'none';
+      });
+    });
+  }
+
+  /* =====================================================================
+     FUNCTIONAL LAYER
+     ===================================================================== */
+
+  // ---- toast ----
+  var toastWrap = document.getElementById('toastWrap');
+  function toast(msg){
+    var t = document.createElement('div');
+    t.className = 'toast';
+    t.innerHTML = '<span class="tk"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>' + msg;
+    toastWrap.appendChild(t);
+    setTimeout(function(){ t.classList.add('out'); setTimeout(function(){ t.remove(); }, 260); }, 2600);
+  }
+
+  // ---- modal ----
+  var modalOv = document.getElementById('modalOv');
+  var modalTitle = document.getElementById('modalTitle');
+  var modalSub = document.getElementById('modalSub');
+  var modalBody = document.getElementById('modalBody');
+  var modalSave = document.getElementById('modalSave');
+
+  // form templates keyed by action label
+  var FORMS = {
+    'New job': {title:'Schedule a job', sub:'Create a new work order', ok:'Job scheduled', fields:[
+      ['Customer','select',['The Reserve HOA','Green Tree Blvd','Midland Dental','DR Horton','New customer…']],
+      ['Service','select',['Standard clean','Deep clean','Move-out','Carpet + tile','Commercial','Post-construction']],
+      ['Date','date',''],['Crew','select',['Crew A','Crew B','Crew C','Carpet van','Construction']] ]},
+    'Schedule job': {alias:'New job'},
+    'New invoice': {title:'New invoice', sub:'Bill a customer', ok:'Invoice created', fields:[
+      ['Customer','select',['Permian Basin LLC','Midland Dental','DR Horton','Loma Vista Office']],
+      ['Amount (USD)','number',''],['Terms','select',['On completion','Net 30','Net 60','Portal · Net 30']],['Due date','date',''] ]},
+    'Add customer': {title:'Add customer', sub:'Create a customer profile', ok:'Customer added', fields:[
+      ['Name','text',''],['Type','select',['Residential','Commercial','Office','Construction']],
+      ['Frequency','select',['One-time','Weekly','Biweekly','Monthly']],['Lead source','select',['Website form','Referral','Google','Facebook','Instagram']] ]},
+    'New quote': {title:'New quote', sub:'Build an estimate', ok:'Quote created', fields:[
+      ['Customer','text',''],['Service','select',['Standard clean','Deep clean','Move-in','Carpet + tile','Commercial']],
+      ['Property size (sq ft)','number',''],['Value (USD)','number',''] ]},
+    'New work order': {alias:'New job'},
+    'Add item': {title:'Add inventory item', sub:'Track a product or equipment', ok:'Item added', fields:[
+      ['Item','text',''],['Category','select',['Chemical','Supply','Equipment']],['On hand','number',''],['Reorder at','number',''] ]},
+    'Create PO': {title:'Create purchase order', sub:'Order from a vendor', ok:'Purchase order created', fields:[
+      ['Vendor','select',['Chem-Pro Distributors','Midland Janitorial Supply','Uline','Costco Business']],['Amount (USD)','number',''],['Notes','textarea',''] ]},
+    'New PO': {alias:'Create PO'},
+    'Add employee': {title:'Add employee', sub:'Onboard a team member', ok:'Employee added', fields:[
+      ['Name','text',''],['Role','select',['Cleaner','Lead cleaner','Carpet tech','Supervisor','Admin']],
+      ['Group','select',['Core','Construction']],['Has a vehicle','select',['Yes','No']] ]},
+    'New message': {title:'New message', sub:'Contact a customer', ok:'Message sent', fields:[
+      ['To','text',''],['Channel','select',['SMS','Email']],['Message','textarea',''] ]}
+  };
+
+  function openModal(action){
+    var cfg = FORMS[action];
+    if(cfg && cfg.alias) cfg = FORMS[cfg.alias];
+    if(!cfg){ cfg = {title:action, sub:'Fill in the details below', ok:'Saved', fields:[['Name','text','']]}; }
+    modalTitle.textContent = cfg.title;
+    modalSub.textContent = cfg.sub;
+    modalSave._ok = cfg.ok;
+    modalBody.innerHTML = cfg.fields.map(function(f){
+      var label = f[0], type = f[1], opts = f[2];
+      var ctl;
+      if(type==='select'){ ctl = '<select>' + opts.map(function(o){return '<option>'+o+'</option>';}).join('') + '</select>'; }
+      else if(type==='textarea'){ ctl = '<textarea rows="3" placeholder="'+label+'"></textarea>'; }
+      else { ctl = '<input type="'+type+'" placeholder="'+label+'"/>'; }
+      return '<div class="mfield"><label>'+label+'</label>'+ctl+'</div>';
+    }).join('');
+    modalOv.classList.add('show');
+  }
+  function closeModal(){ modalOv.classList.remove('show'); }
+  document.getElementById('modalClose').addEventListener('click', closeModal);
+  document.getElementById('modalCancel').addEventListener('click', closeModal);
+  modalOv.addEventListener('click', function(e){ if(e.target === modalOv) closeModal(); });
+  modalSave.addEventListener('click', function(){ var ok = modalSave._ok || 'Saved'; closeModal(); toast(ok); });
+
+  // wire action buttons (New / Add / Create / Schedule / Export / Statements / Week view)
+  document.querySelectorAll('.head-actions .btn, .card .btn.primary').forEach(function(b){
+    b.addEventListener('click', function(){
+      var label = b.textContent.trim();
+      if(FORMS[label] || /^(new|add|create|schedule)/i.test(label)){ openModal(label); }
+      else if(/export|statement/i.test(label)){ toast(label.replace(/export/i,'Exported') + ' ✓'); }
+      else if(/week view/i.test(label)){ toast('Switched to week view'); }
+      else { toast(label); }
+    });
+  });
+
+  // ---- notifications dropdown ----
+  var notifBtn = document.getElementById('notifBtn');
+  var notifDD = document.getElementById('notifDD');
+  notifBtn.addEventListener('click', function(e){ e.stopPropagation(); notifDD.classList.toggle('show'); });
+  document.addEventListener('click', function(e){ if(!notifDD.contains(e.target) && e.target!==notifBtn) notifDD.classList.remove('show'); });
+  notifDD.querySelectorAll('.dd-item').forEach(function(it){
+    it.addEventListener('click', function(){ notifDD.classList.remove('show'); go(it.getAttribute('data-go')); });
+  });
+  document.getElementById('notifClear').addEventListener('click', function(e){
+    e.stopPropagation();
+    var badge = notifBtn.querySelector('.badge'); if(badge) badge.remove();
+    notifDD.classList.remove('show'); toast('All notifications marked read');
+  });
+
+  // ---- settings gear ----
+  document.getElementById('gearBtn').addEventListener('click', function(){ toast('Settings — coming in the platform phase'); });
+
+  // ---- global search: filter tables in the ACTIVE view ----
+  var globalSearch = document.getElementById('globalSearch');
+  globalSearch.addEventListener('input', function(){
+    var q = globalSearch.value.toLowerCase().trim();
+    var active = document.querySelector('.view.active');
+    if(!active) return;
+    active.querySelectorAll('table.tbl').forEach(function(tb){
+      var shown = 0, rows = tb.querySelectorAll('tbody tr');
+      rows.forEach(function(r){
+        var hit = !q || r.textContent.toLowerCase().indexOf(q) > -1;
+        r.style.display = hit ? '' : 'none';
+        if(hit) shown++;
+      });
+      // empty-state row
+      var body = tb.querySelector('tbody');
+      var er = body.querySelector('.no-rows-row');
+      if(shown===0){
+        if(!er){ er = document.createElement('tr'); er.className='no-rows-row'; er.innerHTML='<td colspan="12" style="text-align:center;color:var(--faint);padding:20px">No matches for “'+q+'”</td>'; body.appendChild(er); }
+        er.style.display='';
+      } else if(er){ er.style.display='none'; }
+    });
+  });
+  // reset search text when navigating
+  var _go = go;
+  go = function(v){ _go(v); if(globalSearch){ globalSearch.value=''; globalSearch.dispatchEvent(new Event('input')); } };
+
+  // ---- generic filter pills (visual toggle within their row) ----
+  document.querySelectorAll('.view .pill-row').forEach(function(row){
+    row.querySelectorAll('.fpill').forEach(function(p){
+      p.addEventListener('click', function(){
+        row.querySelectorAll('.fpill').forEach(function(x){x.classList.remove('on');});
+        p.classList.add('on');
+        toast('Filter: ' + p.textContent.trim());
+      });
+    });
+  });
+
+  // ---- clickable table rows ----
+  document.querySelectorAll('table.tbl tbody').forEach(function(body){
+    body.addEventListener('click', function(e){
+      var tr = e.target.closest('tr'); if(!tr || tr.classList.contains('no-rows-row')) return;
+      var first = tr.querySelector('td'); if(!first) return;
+      toast('Opened ' + first.textContent.trim());
+    });
+  });
+
+  // ---- ESC closes modal / dropdown ----
+  document.addEventListener('keydown', function(e){
+    if(e.key==='Escape'){ closeModal(); notifDD.classList.remove('show'); }
+  });
+</script>
+</body>
+</html>

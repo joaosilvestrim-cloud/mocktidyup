@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>TidyUp! — Potential ERP Modules</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+<style>
+/* ============================================================
+   TidyUp! — Potential ERP Modules  (HTML mockup)
+   Brand: deep teal-blue #01475D · bright cyan #02CDFF · light bg
+   ============================================================ */
+:root{
+  --navy:#01475D; --navy-2:#013646; --cyan:#02CDFF; --cyan-ink:#0797bd;
+  --ink:#16293d; --text:#465563; --muted:#7c8a95; --faint:#9aa6b0;
+  --line:#e6eef2; --soft:#f5fafc; --soft-line:#e8eff3; --card:#ffffff;
+  --bg:#eef4f7;
+  /* category accents (from the source infographic) */
+  --blue:#2f6fed; --teal:#12b5a6; --green:#1fa565; --amber:#eaa61b;
+  --orange:#ef7d1a; --purple:#7c46e0; --red:#ef4553;
+  --grad:linear-gradient(90deg,#01475D 0%,#0a86a8 55%,#02CDFF 100%);
+  --shadow:0 1px 2px rgba(1,54,70,.05),0 12px 30px -18px rgba(1,54,70,.28);
+  --shadow-md:0 4px 10px rgba(1,54,70,.06),0 24px 46px -22px rgba(1,54,70,.32);
+  --radius:16px; --radius-sm:10px; --maxw:1360px;
+}
+*{box-sizing:border-box; margin:0; padding:0}
+html{scroll-behavior:smooth}
+body{font-family:"Inter",system-ui,-apple-system,Segoe UI,sans-serif; color:var(--text); background:var(--bg); line-height:1.6; -webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:"Sora",system-ui,sans-serif; color:var(--ink); line-height:1.12; letter-spacing:-.015em}
+.mono{font-family:"JetBrains Mono",ui-monospace,monospace}
+
+/* ===== page shell ===== */
+.wrap{max-width:var(--maxw); margin:0 auto; padding:34px 26px 70px}
+
+/* ===== HERO / HEADER ===== */
+.hero{
+  position:relative; overflow:hidden; border-radius:22px; margin-bottom:26px;
+  background:
+    radial-gradient(1000px 520px at 84% -10%, rgba(2,205,255,.30), transparent 62%),
+    radial-gradient(760px 560px at 6% 130%, rgba(2,205,255,.14), transparent 60%),
+    linear-gradient(155deg,#013646 0%,#01475D 52%,#013848 100%);
+  color:#dcedf3; padding:40px 44px;
+}
+.hero-grid{position:absolute; inset:0; opacity:.5; pointer-events:none;
+  background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);
+  background-size:48px 48px; mask-image:radial-gradient(130% 100% at 80% 10%,#000 30%,transparent 82%)}
+.hero-in{position:relative; display:flex; justify-content:space-between; align-items:flex-start; gap:24px; flex-wrap:wrap}
+.hero-eyebrow{font-family:"JetBrains Mono"; font-size:11px; letter-spacing:.42em; text-transform:uppercase; color:#7fe4fb}
+.accent-bar{width:104px; height:5px; border-radius:4px; background:linear-gradient(90deg,#02CDFF,#7fe4fb); margin:16px 0 18px}
+.hero h1{color:#fff; font-size:clamp(30px,4.4vw,50px); font-weight:800; letter-spacing:-.028em; line-height:1}
+.hero h1 em{font-style:normal; background:linear-gradient(90deg,#02CDFF,#8fe9ff); -webkit-background-clip:text; background-clip:text; color:transparent}
+.hero-sub{font-size:16px; color:#a9cede; max-width:560px; margin-top:14px; line-height:1.55}
+.hero-badge{display:flex; flex-direction:column; align-items:flex-end; gap:10px; text-align:right}
+.broom{width:64px; height:64px; filter:drop-shadow(0 8px 20px rgba(2,205,255,.4))}
+.hero-stamp{font-family:"JetBrains Mono"; font-size:10.5px; letter-spacing:.3em; color:#7fe4fb}
+.hero-stamp span{display:block; color:#5f93a8; letter-spacing:.2em; margin-top:3px}
+.hero-pills{position:relative; display:flex; gap:9px; flex-wrap:wrap; margin-top:24px}
+.hpill{font-family:"JetBrains Mono"; font-size:10px; letter-spacing:.22em; text-transform:uppercase; color:#bfe4f0; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.13); padding:6px 13px; border-radius:100px}
+.hpill.hi{color:#02CDFF; border-color:rgba(2,205,255,.34); background:rgba(2,205,255,.09)}
+
+/* ===== SECTION LABEL ===== */
+.sec-label{display:flex; align-items:center; gap:12px; margin:34px 2px 16px}
+.sec-label .k{font-family:"JetBrains Mono"; font-size:10.5px; letter-spacing:.3em; text-transform:uppercase; color:var(--cyan-ink)}
+.sec-label .l{height:1px; flex:1; background:var(--line)}
+
+/* ===== MODULE GRID ===== */
+.grid{display:grid; grid-template-columns:repeat(4,1fr); gap:18px}
+@media(max-width:1160px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){.grid{grid-template-columns:1fr}}
+
+.mod{
+  --a:var(--blue);
+  background:var(--card); border:1px solid var(--soft-line); border-radius:var(--radius);
+  box-shadow:var(--shadow); overflow:hidden; position:relative;
+  transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  display:flex; flex-direction:column;
+}
+.mod::before{content:""; position:absolute; top:0; left:0; right:0; height:3px; background:var(--a); opacity:.9}
+.mod:hover{transform:translateY(-4px); box-shadow:var(--shadow-md); border-color:color-mix(in srgb, var(--a) 40%, var(--soft-line))}
+.mod.flash{border-color:var(--a); box-shadow:0 0 0 3px color-mix(in srgb, var(--a) 22%, transparent), var(--shadow-md)}
+.mod-head{display:flex; align-items:center; gap:12px; padding:16px 16px 12px;
+  background:linear-gradient(180deg, color-mix(in srgb, var(--a) 8%, #fff), #fff)}
+.mod-ico{flex:0 0 auto; width:42px; height:42px; border-radius:11px; display:grid; place-items:center;
+  background:var(--a); box-shadow:0 8px 18px -8px color-mix(in srgb,var(--a) 80%, transparent)}
+.mod-ico svg{width:22px; height:22px; stroke:#fff; fill:none; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round}
+.mod-t{min-width:0}
+.mod-n{font-family:"JetBrains Mono"; font-size:10px; letter-spacing:.16em; color:var(--a); font-weight:700}
+.mod-t h3{font-size:15px; font-weight:700; margin-top:1px; line-height:1.15}
+.mod-body{padding:4px 16px 15px}
+.mod-body ul{list-style:none}
+.mod-body li{position:relative; padding:5px 0 5px 16px; font-size:12.6px; line-height:1.42; color:var(--text); border-bottom:1px dashed var(--soft-line)}
+.mod-body li:last-child{border-bottom:none}
+.mod-body li::before{content:""; position:absolute; left:2px; top:11px; width:5px; height:5px; border-radius:2px; background:var(--a)}
+.mod-body li b{color:var(--ink); font-weight:600}
+.mod-foot{margin-top:auto; padding:9px 16px 13px; display:flex; gap:6px; flex-wrap:wrap; border-top:1px solid var(--soft-line)}
+.src{font-family:"JetBrains Mono"; font-size:8.6px; letter-spacing:.08em; text-transform:uppercase; padding:3px 7px; border-radius:6px; font-weight:700; white-space:nowrap}
+.src.hcp{color:#0663a8; background:#e8f3fc; border:1px solid #cfe6f8}
+.src.qb{color:#1c7a3e; background:#e9f6ec; border:1px solid #cbebd3}
+.src.new{color:#7a3ecb; background:#f2ecfd; border:1px solid #e3d6f8}
+.src.hub{color:#0797bd; background:#e5f9ff; border:1px solid #c3eefb}
+
+/* ===== INTEGRATIONS ===== */
+.panel{background:var(--card); border:1px solid var(--soft-line); border-radius:var(--radius); box-shadow:var(--shadow); padding:22px 24px}
+.integ{display:flex; align-items:center; justify-content:center; gap:20px; flex-wrap:wrap}
+.node{display:flex; flex-direction:column; align-items:center; gap:6px; text-align:center; min-width:140px}
+.node .box{width:100%; padding:14px 18px; border-radius:12px; border:1px solid var(--soft-line); background:var(--soft); font-weight:700; color:var(--ink); font-size:14px; text-align:center}
+.node .box.hub{background:linear-gradient(155deg,#013646,#01475D); color:#fff; border:none; box-shadow:0 14px 30px -14px rgba(1,71,93,.7)}
+.node .box.hub small{display:block; font-family:"JetBrains Mono"; font-size:9.5px; letter-spacing:.18em; color:#7fe4fb; margin-top:3px; font-weight:500}
+.node small.cap{font-size:11px; color:var(--muted)}
+.arrow{color:var(--cyan-ink); font-size:26px; line-height:1; flex:0 0 auto}
+.logo-hcp{color:#1f7ae0; font-weight:800; font-size:15px; font-family:"Sora"}
+.logo-qb{color:#2ca01c; font-weight:800; font-size:15px; font-family:"Sora"}
+
+/* ===== PRIORITY ===== */
+.prio{display:flex; align-items:stretch; gap:10px; flex-wrap:wrap; justify-content:center}
+.step{flex:1 1 150px; min-width:140px; max-width:200px; background:var(--soft); border:1px solid var(--soft-line); border-radius:12px; padding:14px 12px; text-align:center; cursor:pointer; transition:.16s; position:relative}
+.step:hover{border-color:var(--cyan); background:#fff; transform:translateY(-3px); box-shadow:var(--shadow)}
+.step .rank{width:26px; height:26px; border-radius:50%; display:grid; place-items:center; margin:0 auto 8px; font-family:"JetBrains Mono"; font-weight:700; font-size:12px; color:#fff; background:var(--navy)}
+.step h4{font-size:12.5px; line-height:1.25; color:var(--ink)}
+.step .why{font-size:10.5px; color:var(--muted); margin-top:5px; line-height:1.35}
+.step .arrowdown{position:absolute; right:-11px; top:50%; transform:translateY(-50%); color:var(--faint); font-weight:700; font-size:16px}
+@media(max-width:1160px){.step .arrowdown{display:none}}
+
+/* ===== GOAL ===== */
+.goal{margin-top:26px; display:flex; gap:16px; align-items:flex-start; background:linear-gradient(120deg,#f3fbfe,#eefaff); border:1px solid #d4eef8; border-radius:var(--radius); padding:20px 24px}
+.goal .g-ico{flex:0 0 auto; width:44px; height:44px; border-radius:12px; background:var(--grad); display:grid; place-items:center}
+.goal .g-ico svg{width:22px; height:22px; stroke:#fff; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
+.goal h4{font-size:14px; margin-bottom:3px}
+.goal p{font-size:13.5px; color:var(--text); line-height:1.55; max-width:900px}
+.goal b{color:var(--navy)}
+
+/* footer note */
+.note{margin-top:28px; text-align:center; font-size:11.5px; color:var(--faint); line-height:1.6}
+.note .mono{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ============ HERO ============ -->
+  <header class="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-in">
+      <div>
+        <div class="hero-eyebrow">TidyUp! Professional Cleaning · Midland TX</div>
+        <div class="accent-bar"></div>
+        <h1>Potential <em>ERP&nbsp;Modules</em></h1>
+        <p class="hero-sub">An integrated hub to run operations, people, customers and finances from one place — fed by the tools TidyUp! already uses, built to grow with the company.</p>
+      </div>
+      <div class="hero-badge">
+        <svg class="broom" viewBox="0 0 24 24" fill="none" stroke="#02CDFF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19.4 4.6 13 11"/><path d="M9 15c-2 2-3 3-6.5 3.5C3 15 4 14 6 12l3 3Z"/>
+          <path d="m10.5 10.5 3 3"/><path d="M8 17c1.5.4 3 .2 4-1"/>
+        </svg>
+        <div class="hero-stamp">CONCEPT · v1<span>Discovery → Platform</span></div>
+      </div>
+    </div>
+    <div class="hero-pills">
+      <span class="hpill">12 Modules</span>
+      <span class="hpill">3 Layers · Operations · People · Financials</span>
+      <span class="hpill hi">Phased Roadmap</span>
+      <span class="hpill">Housecall Pro + QuickBooks</span>
+    </div>
+  </header>
+
+  <div class="sec-label"><span class="k">The Twelve Modules</span><span class="l"></span></div>
+
+  <!-- ============ MODULE GRID ============ -->
+  <section class="grid" id="grid">
+
+    <!-- 1 -->
+    <article class="mod" id="mod-1" style="--a:var(--blue)">
+      <div class="mod-head">
+        <div class="mod-ico"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <div class="mod-t"><div class="mod-n">MODULE 01</div><h3>Customer Management</h3></div>
+      </div>
+      <div class="mod-body"><ul>
+        <li>Customer profiles &amp; full service history</li>
+        <li>Residential, commercial &amp; construction accounts</li>
+        <li>Leads from the website form, with <b>referral source kept</b></li>
+        <li>Silent-churn &amp; retention signals</li>
+      </ul></div>
+      <div class="mod-foot"><span class="src hcp">Housecall Pro</span><span class="src new">New field</span></div>
+    </article>
+
+    <!-- 2 -->
+    <article class="mod" id="mod-2" style="--a:var(--blue)">
+      <div class="mod-head">
+        <div class="mod-ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="m8 15 2 2 4-4"/></svg></div>
+        <div class="mod-t"><div class="mod-n">MODULE 02</div><h3>Scheduling &amp; Dispatch</h3></div>
+      </div>
+      <div class="mod-body"><ul>
+        <li>Crew sizing by property size &amp; service type</li>
+        <li>Recurring jobs (≈70% of revenue, mostly biweekly)</li>
+        <li>Constraint-aware: <b>vehicle availability</b>, not routing</li>
+        <li>Objective: equal hours across crews</li>
+      </ul></div>
+      <div class="mod-foot"><span class="src hcp">Housecall Pro</span><span class="src hub">Hub logic</span></div>
+    </article>
+
+    <!-- 3 -->
+    <article class="mod" id="mod-3" style="--a:var(--blue)">
+      <div class="mod-head">
+        <div class="mod-ico"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="m9 14 2 2 4-4"/></svg></div>
+        <div class="mod-t"><div class="mod-n">MODULE 03</div><h3>Work Order Management</h3></div>
+      </div>
+      <div class="mod-body"><ul>
+        <li>Service details &amp; on-site instructions</li>
+        <li>Job status: scheduled · in progress · done · cancelled</li>
+        <li>Before &amp; after photos</li>
+        <li>Estimated vs. actual duration per job</li>
+      </ul></div>
+      <div class="mod-foot"><span class="src hcp">Housecall Pro</span></div>
+    </article>
+
+    <!-- 4 -->
+    <article class="mod" id="mod-4" style="--a:var(--teal)">
+      <div class="mod-head">
+        <div class="mod-ico"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <div class="mod-t"><div class="mod-n">MODULE 04</div><h3>Workforce Management</h3></div>
+      </div>
+      <div class="mod-body"><ul>
+        <li>Employee availability, cars &amp; working hours</li>
+        <li>Skills &amp; certifications</li>
+        <li><b>Stable core vs. construction crew</b>, tracked apart</li>
+        <li>Attendance, sick time &amp; productivity</li>
+      </ul></div>
+      <div class="mod-foot"><span class="src new">New module</span></div>
+    </article>
+
+    <!-- 5 -->
+    <article class="mod" id="mod-5" style="--a:var(--green)">
+      <div class="mod-head">
+        <div class="mod-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M14.5 9.5a2.5 2 0 0 0-2.5-1.5c-1.4 0-2.5.7-2.5 1.8s1.1 1.5 2.5 1.9 2.5.8 2.5 1.9-1.1 1.8-2.5 1.8a2.5 2 0 0 1-2.5-1.5"/></svg></div>
+        <div class="mod-t"><div class="mod-n">MODULE 05</div><h3>Finance &amp; Accounting</h3></div>
+      </div>
+      <div class="mod-body"><ul>
+        <li>Invoicing &amp; payments</li>
+        <li>Accounts receivable &amp; payable</li>
+        <li><b>True labor cost</b> — fixes owner's-draw understatement</li>
+        <li>Profitability by service, customer &amp; segment</li>
+      </ul></div>
+      <div class="mod-foot"><span class="src qb">QuickBooks</span><span class="src hub">Cost model</span></div>
+    </article>
+
+    <!-- 6 -->
+    <article class="mod" id="mod-6" style="--a:var(--green)">
+      <div class="mod-head">
+        <div class="mod-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+        <div class="mod-t"><div class="mod-n">MODULE 06</div><h3>Payroll &amp; Time Tracking</h3></div>
+      </div>
+      <div class="mod-body"><ul>
+        <li>Timesheets &amp; per-job clock</li>
+        <li><b>Two pay regimes</b>: allotted-hours vs. actual clocked</li>
+        <li>Material hours as a separate paid category</li>
+        <li>Biweekly quality &amp; breakage bonuses as real cost</li>
+      </ul></div>
+      <div class="mod-foot"><span class="src qb">QuickBooks</span><span class="src new">Hours intake</span></div>
+    </article>
+
+    <!-- 7 -->
+    <article class="mod" id="mod-7" style="--a:var(--amber)">
+      <div class="mod-head">
+        <div class="mod-ico"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h4"/></svg></div>
+        <div class="mod-t"><div class="mod-n">MODULE 07</div><h3>Sales &amp; Quotation</h3></div>
+      </div>
+      <div class="mod-body"><ul>
+        <li>Quote creation &amp; 48-hour response promise</li>
+        <li>Quote-to-job conversion (target ≈6 in 10)</li>
+        <li>Pricing calculator by property &amp; service</li>
+        <li>Discounts &amp; recurring packages</li>
+      </ul></div>
+      <div class="mod-foot"><span class="src hcp">Housecall Pro</span><span class="src new">Pricing calc</span></div>
+    </article>
+
+    <!-- 8 -->
+    <article class="mod" id="mod-8" style="--a:var(--orange)">
+      <div class="mod-head">
+        <div class="mod-ico"><svg viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg></div>
+        <div class="mod-t"><div class="mod-n">MODULE 08</div><h3>Inventory &amp; Supplies</h3></div>
+      </div>
+      <div class="mod-body"><ul>
+        <li>Cleaning-product inventory</li>
+        <li>Equipment &amp; financed carpet-van tracking</li>
+        <li>Reorder alerts</li>
+        <li>Consumption by team &amp; job</li>
+      </ul></div>
+      <div class="mod-foot"><span class="src new">New module</span></div>
+    </article>
+
+    <!-- 9 -->
+    <article class="mod" id="mod-9" style="--a:var(--purple)">
+      <div class="mod-head">
+        <div class="mod-ico"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.5 3H5l2.7 12.4a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.6L21 7H6"/></svg></div>
+        <div class="mod-t"><div class="mod-n">MODULE 09</div><h3>Procurement &amp; Vendors</h3></div>
+      </div>
+      <div class="mod-body"><ul>
+        <li>Supplier database</li>
+        <li>Purchase orders</li>
+        <li>Supplier pricing &amp; performance</li>
+        <li>Expense approval</li>
+      </ul></div>
+      <div class="mod-foot"><span class="src new">New module</span></div>
+    </article>
+
+    <!-- 10 -->
+    <article class="mod" id="mod-10" style="--a:var(--purple)">
+      <div class="mod-head">
+        <div class="mod-ico"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <div class="mod-t"><div class="mod-n">MODULE 10</div><h3>Customer Communication</h3></div>
+      </div>
+      <div class="mod-body"><ul>
+        <li>Appointment confirmations</li>
+        <li>Reminders &amp; notifications</li>
+        <li>Feedback channel beyond public reviews</li>
+        <li>Complaints &amp; service recovery (guarantee)</li>
+      </ul></div>
+      <div class="mod-foot"><span class="src hcp">Housecall Pro</span><span class="src new">Feedback</span></div>
+    </article>
+
+    <!-- 11 -->
+    <article class="mod" id="mod-11" style="--a:var(--red)">
+      <div class="mod-head">
+        <div class="mod-ico"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></div>
+        <div class="mod-t"><div class="mod-n">MODULE 11</div><h3>Quality &amp; Compliance</h3></div>
+      </div>
+      <div class="mod-body"><ul>
+        <li>Cleaning checklists</li>
+        <li>Inspection results</li>
+        <li>Incidents &amp; corrective actions</li>
+        <li>Training &amp; safety documentation</li>
+      </ul></div>
+      <div class="mod-foot"><span class="src new">New module</span></div>
+    </article>
+
+    <!-- 12 -->
+    <article class="mod" id="mod-12" style="--a:var(--blue)">
+      <div class="mod-head">
+        <div class="mod-ico"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6"/><rect x="12" y="8" width="3" height="10"/><rect x="17" y="4" width="3" height="14"/></svg></div>
+        <div class="mod-t"><div class="mod-n">MODULE 12</div><h3>Business Intelligence</h3></div>
+      </div>
+      <div class="mod-body"><ul>
+        <li>Revenue &amp; margin (the 6-screen reporting layer)</li>
+        <li>Jobs completed &amp; cancelled</li>
+        <li>Employee utilization</li>
+        <li>Profitability by service, customer &amp; location</li>
+      </ul></div>
+      <div class="mod-foot"><span class="src hub">Data Hub</span><span class="src qb">QuickBooks</span></div>
+    </article>
+
+  </section>
+
+  <!-- ============ KEY INTEGRATIONS ============ -->
+  <div class="sec-label"><span class="k">Key Integrations</span><span class="l"></span></div>
+  <section class="panel">
+    <div class="integ">
+      <div class="node">
+        <div class="box"><span class="logo-hcp">Housecall Pro</span></div>
+        <small class="cap">Read-only source · scheduling, jobs, clock</small>
+      </div>
+      <div class="arrow">&#8646;</div>
+      <div class="node">
+        <div class="box hub">TidyUp! ERP<small>ERP / DATA HUB</small></div>
+        <small class="cap">Pulls · direct entry · spreadsheet upload</small>
+      </div>
+      <div class="arrow">&#8646;</div>
+      <div class="node">
+        <div class="box"><span class="logo-qb">QuickBooks</span></div>
+        <small class="cap">Payroll · expenses · bookkeeping</small>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RECOMMENDED PRIORITY ============ -->
+  <div class="sec-label"><span class="k">Recommended Priority</span><span class="l"></span></div>
+  <section class="panel">
+    <div class="prio">
+      <div class="step" data-mod="5"><span class="arrowdown">&rsaquo;</span><div class="rank">1</div><h4>Finance &amp; Accounting</h4><div class="why">The stalled raise decision — start here</div></div>
+      <div class="step" data-mod="6"><span class="arrowdown">&rsaquo;</span><div class="rank">2</div><h4>Payroll &amp; Time Tracking</h4><div class="why">Fixes the true labor cost</div></div>
+      <div class="step" data-mod="12"><span class="arrowdown">&rsaquo;</span><div class="rank">3</div><h4>Business Intelligence</h4><div class="why">The 6-screen reporting layer</div></div>
+      <div class="step" data-mod="1"><span class="arrowdown">&rsaquo;</span><div class="rank">4</div><h4>Customer Management</h4><div class="why">Leads &amp; churn, source kept</div></div>
+      <div class="step" data-mod="2"><span class="arrowdown">&rsaquo;</span><div class="rank">5</div><h4>Scheduling &amp; Work Orders</h4><div class="why">Hours approval &amp; dispatch</div></div>
+      <div class="step" data-mod="8"><div class="rank">6</div><h4>Inventory &amp; Supplies</h4><div class="why">Materials into the cost model</div></div>
+    </div>
+  </section>
+
+  <!-- ============ GOAL ============ -->
+  <div class="goal">
+    <div class="g-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg></div>
+    <div>
+      <h4>The Goal</h4>
+      <p>Build an integrated ERP-style hub that connects <b>operations, people, customers and finance</b> — giving TidyUp! visibility, efficiency and data-driven decisions, so growth funds better pay instead of outrunning the numbers. The reporting layer ships first; every later module plugs into the same hub, so nothing built now is lost.</p>
+    </div>
+  </div>
+
+  <p class="note">
+    Concept mockup for <span class="mono">TidyUp! Professional Cleaning Services LLC</span> · Midland · Odessa · Greenwood, TX<br/>
+    Financials ship first (current engagement) — the platform modules are a phased roadmap, not a single build. Source tags show where each module's data lives today.
+  </p>
+
+</div>
+
+<script>
+  // Priority chip → highlight matching module card
+  document.querySelectorAll('.step').forEach(function(s){
+    s.addEventListener('click', function(){
+      var id = 'mod-' + s.getAttribute('data-mod');
+      var el = document.getElementById(id);
+      if(!el) return;
+      el.scrollIntoView({behavior:'smooth', block:'center'});
+      document.querySelectorAll('.mod.flash').forEach(function(m){m.classList.remove('flash');});
+      el.classList.add('flash');
+      setTimeout(function(){ el.classList.remove('flash'); }, 1600);
+    });
+  });
+</script>
+</body>
+</html>
