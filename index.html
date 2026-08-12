@@ -38,11 +38,11 @@ h1,h2,h3,h4{font-family:"Sora",system-ui,sans-serif; color:var(--ink); line-heig
 ::selection{background:rgba(2,205,255,.24)}
 ::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:#c6d6dd;border-radius:8px;border:2px solid transparent;background-clip:content-box}::-webkit-scrollbar-thumb:hover{background:#aebfc8}
 
-/* ============ STAGE CONTROL ============ */
+/* ============ STAGE CONTROL (scoped to #stageRoot, not <body>) ============ */
 #login,#hub{display:none}
-body.stage-login #login{display:flex}
-body.stage-hub #hub{display:block}
-body.stage-app .app{display:grid}
+#stageRoot.stage-login #login{display:flex}
+#stageRoot.stage-hub #hub{display:block}
+#stageRoot.stage-app .app{display:grid}
 
 /* ============ APP SHELL ============ */
 .app{display:none; grid-template-columns:246px 1fr; height:100vh; overflow:hidden}
@@ -528,7 +528,8 @@ body.stage-app .app{display:grid}
 .alert h4{letter-spacing:-.01em}
 </style>
 </head>
-<body class="stage-login">
+<body>
+<div id="stageRoot" class="stage-login">
 
 <!-- ============================================================ LOGIN -->
 <div id="login">
@@ -1503,6 +1504,8 @@ body.stage-app .app{display:grid}
   </div>
 </div>
 
+</div><!-- /#stageRoot -->
+
 <!-- ============ NOTIFICATIONS DROPDOWN ============ -->
 <div class="dd" id="notifDD">
   <div class="dd-head"><h4>Notifications</h4><span id="notifClear">Mark all read</span></div>
@@ -1535,7 +1538,8 @@ body.stage-app .app{display:grid}
 <script>
   // ---- stage control (login → hub → app) ----
   function showStage(s){
-    document.body.className = 'stage-' + s;
+    var root = document.getElementById('stageRoot');
+    if(root) root.className = 'stage-' + s;
     window.scrollTo(0,0);
   }
 
