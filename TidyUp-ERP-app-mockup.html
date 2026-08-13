@@ -294,6 +294,28 @@ h1,h2,h3,h4{font-family:"Sora",system-ui,sans-serif; color:var(--ink); line-heig
 .mcard:hover .mc-open{opacity:1; transform:none}
 .no-hit{text-align:center; color:var(--faint); font-size:13px; padding:30px; display:none}
 
+/* LEVEL 1 — layer menu */
+.layer-menu{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:18px}
+@media(max-width:900px){.layer-menu{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.layer-menu{grid-template-columns:1fr}}
+.layer-card{--a:var(--blue); display:flex; align-items:center; gap:12px; padding:14px 15px; background:var(--card); border:1px solid var(--soft-line); border-radius:13px; box-shadow:var(--shadow); cursor:pointer; position:relative; overflow:hidden; transition:transform .15s, box-shadow .15s, border-color .15s}
+.layer-card::before{content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--a); opacity:0; transition:.15s}
+.layer-card:hover{transform:translateY(-2px); box-shadow:var(--shadow-md); border-color:color-mix(in srgb,var(--a) 40%, var(--soft-line))}
+.layer-card.active{border-color:var(--a); background:color-mix(in srgb,var(--a) 7%, #fff)}
+.layer-card.active::before{opacity:1}
+.layer-card .lc-ic{width:38px; height:38px; border-radius:11px; display:grid; place-items:center; background:color-mix(in srgb,var(--a) 16%, transparent); flex:0 0 auto; transition:.15s}
+.layer-card .lc-ic svg{width:19px; height:19px; stroke:var(--a); fill:none; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round}
+.layer-card.active .lc-ic{background:var(--a)}
+.layer-card.active .lc-ic svg{stroke:#fff}
+.layer-card .lc-t{min-width:0; flex:1}
+.layer-card .lc-t b{font-family:"Sora"; font-size:14.5px; color:var(--ink); font-weight:700; display:block; letter-spacing:-.01em}
+.layer-card .lc-t span{font-size:11px; color:var(--muted)}
+.layer-card .lc-arrow{width:16px; height:16px; stroke:var(--faint); fill:none; stroke-width:2.2; flex:0 0 auto; transition:.15s}
+.layer-card.active .lc-arrow{stroke:var(--a); transform:rotate(90deg)}
+
+/* level-2 group heading tweak when layer-driven */
+.lgroup{scroll-margin-top:20px}
+
 /* ============================================================
    LOGIN SCREEN
    ============================================================ */
@@ -628,13 +650,38 @@ h1,h2,h3,h4{font-family:"Sora",system-ui,sans-serif; color:var(--ink); line-heig
       </div>
     </div>
 
+    <!-- LEVEL 1 — layer menu -->
+    <div class="layer-menu" id="layerMenu">
+      <div class="layer-card active" data-layer="operations" style="--a:var(--blue)">
+        <span class="lc-ic"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span>
+        <div class="lc-t"><b>Operations</b><span>4 modules</span></div>
+        <svg class="lc-arrow" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+      </div>
+      <div class="layer-card" data-layer="customers" style="--a:var(--teal)">
+        <span class="lc-ic"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg></span>
+        <div class="lc-t"><b>Customers</b><span>4 modules</span></div>
+        <svg class="lc-arrow" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+      </div>
+      <div class="layer-card" data-layer="people" style="--a:var(--purple)">
+        <span class="lc-ic"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg></span>
+        <div class="lc-t"><b>People</b><span>2 modules</span></div>
+        <svg class="lc-arrow" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+      </div>
+      <div class="layer-card" data-layer="finance" style="--a:var(--green)">
+        <span class="lc-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M14.5 9.5a2.5 2 0 0 0-2.5-1.5c-1.4 0-2.5.7-2.5 1.8s1.1 1.5 2.5 1.9 2.5.8 2.5 1.9-1.1 1.8-2.5 1.8a2.5 2 0 0 1-2.5-1.5"/></svg></span>
+        <div class="lc-t"><b>Finance</b><span>2 modules</span></div>
+        <svg class="lc-arrow" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+      </div>
+    </div>
+
+    <!-- LEVEL 2 — search + phase (scoped to the chosen layer) -->
     <div class="launch-tools">
       <div class="msearch">
         <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-        <input id="modSearch" placeholder="Search modules…"/>
+        <input id="modSearch" placeholder="Search all modules…"/>
       </div>
       <div class="pill-row" style="margin:0" id="phaseFilter">
-        <span class="fpill on" data-ph="all">All</span>
+        <span class="fpill on" data-ph="all">All phases</span>
         <span class="fpill" data-ph="now">Live now</span>
         <span class="fpill" data-ph="next">Next</span>
         <span class="fpill" data-ph="later">Roadmap</span>
@@ -857,126 +904,6 @@ h1,h2,h3,h4{font-family:"Sora",system-ui,sans-serif; color:var(--ink); line-heig
     </div>
 
     <div class="canvas">
-
-      <!-- ========================================================= LAUNCHER (legacy, replaced by #hub) -->
-      <section class="view" id="view-launcher" hidden>
-        <div class="launch-wrap">
-          <div class="launch-hero">
-            <div class="eyebrow">TidyUp! Operating Hub · Midland TX</div>
-            <h2>Choose a module</h2>
-            <p>One hub for operations, people, customers and finances — fed by Housecall Pro and QuickBooks. Financials ship first; the rest is a phased roadmap.</p>
-            <div class="lh-stat">
-              <div class="s"><b>12</b><span>MODULES</span></div>
-              <div class="s"><b>4</b><span>LAYERS</span></div>
-              <div class="s"><b>3</b><span>LIVE NOW</span></div>
-            </div>
-          </div>
-
-          <div class="launch-tools">
-            <div class="msearch">
-              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-              <input id="modSearch" placeholder="Search modules…"/>
-            </div>
-            <div class="pill-row" style="margin:0" id="phaseFilter">
-              <span class="fpill on" data-ph="all">All</span>
-              <span class="fpill" data-ph="now">Live now</span>
-              <span class="fpill" data-ph="next">Next</span>
-              <span class="fpill" data-ph="later">Roadmap</span>
-            </div>
-          </div>
-
-          <div id="modResults">
-            <!-- OPERATIONS -->
-            <div class="lgroup" data-layer="operations">
-              <div class="lgroup-head"><span class="lgl">Operations</span><span class="lgc">4 modules</span><span class="line"></span></div>
-              <div class="mgrid">
-                <div class="mcard" data-go="scheduling" data-ph="next" data-name="scheduling dispatch crew" style="--a:var(--blue)">
-                  <div class="mc-top"><span class="mc-ic"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span><span class="mc-rank">P5</span></div>
-                  <h4>Scheduling &amp; Dispatch</h4><p>Crew sizing, recurring jobs, vehicle-aware dispatch</p>
-                  <div class="mc-foot"><span class="ph ph-next">Next</span><span class="mc-open">Open →</span></div>
-                </div>
-                <div class="mcard" data-go="workorders" data-ph="next" data-name="work orders jobs status" style="--a:var(--blue)">
-                  <div class="mc-top"><span class="mc-ic"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg></span></div>
-                  <h4>Work Orders</h4><p>Service details, status, before/after, est. vs actual</p>
-                  <div class="mc-foot"><span class="ph ph-next">Next</span><span class="mc-open">Open →</span></div>
-                </div>
-                <div class="mcard" data-go="inventory" data-ph="later" data-name="inventory supplies stock materials" style="--a:var(--orange)">
-                  <div class="mc-top"><span class="mc-ic"><svg viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="M3 8l9 5 9-5"/></svg></span><span class="mc-rank">P6</span></div>
-                  <h4>Inventory &amp; Supplies</h4><p>Products, equipment, reorder alerts, consumption</p>
-                  <div class="mc-foot"><span class="ph ph-later">Roadmap</span><span class="mc-open">Open →</span></div>
-                </div>
-                <div class="mcard" data-go="procurement" data-ph="later" data-name="procurement vendors suppliers purchase orders" style="--a:var(--purple)">
-                  <div class="mc-top"><span class="mc-ic"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.5 3H5l2.7 12.4a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.6L21 7H6"/></svg></span></div>
-                  <h4>Procurement &amp; Vendors</h4><p>Suppliers, purchase orders, expense approval</p>
-                  <div class="mc-foot"><span class="ph ph-later">Roadmap</span><span class="mc-open">Open →</span></div>
-                </div>
-              </div>
-            </div>
-
-            <!-- CUSTOMERS -->
-            <div class="lgroup" data-layer="customers">
-              <div class="lgroup-head"><span class="lgl">Customers</span><span class="lgc">4 modules</span><span class="line"></span></div>
-              <div class="mgrid">
-                <div class="mcard" data-go="customers" data-ph="next" data-name="customer management leads churn" style="--a:var(--teal)">
-                  <div class="mc-top"><span class="mc-ic"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg></span><span class="mc-rank">P4</span></div>
-                  <h4>Customer Management</h4><p>Profiles, history, leads with source, churn signals</p>
-                  <div class="mc-foot"><span class="ph ph-next">Next</span><span class="mc-open">Open →</span></div>
-                </div>
-                <div class="mcard" data-go="sales" data-ph="later" data-name="sales quotation quotes pricing" style="--a:var(--amber)">
-                  <div class="mc-top"><span class="mc-ic"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></span></div>
-                  <h4>Sales &amp; Quotation</h4><p>Quote-to-job, pricing calculator, packages</p>
-                  <div class="mc-foot"><span class="ph ph-later">Roadmap</span><span class="mc-open">Open →</span></div>
-                </div>
-                <div class="mcard" data-go="communication" data-ph="later" data-name="communication messages reminders feedback" style="--a:var(--purple)">
-                  <div class="mc-top"><span class="mc-ic"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span></div>
-                  <h4>Customer Communication</h4><p>Confirmations, reminders, feedback channel</p>
-                  <div class="mc-foot"><span class="ph ph-later">Roadmap</span><span class="mc-open">Open →</span></div>
-                </div>
-                <div class="mcard" data-go="quality" data-ph="later" data-name="quality compliance complaints checklists" style="--a:var(--red)">
-                  <div class="mc-top"><span class="mc-ic"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></span></div>
-                  <h4>Quality &amp; Compliance</h4><p>Complaints, inspections, the service guarantee</p>
-                  <div class="mc-foot"><span class="ph ph-later">Roadmap</span><span class="mc-open">Open →</span></div>
-                </div>
-              </div>
-            </div>
-
-            <!-- PEOPLE -->
-            <div class="lgroup" data-layer="people">
-              <div class="lgroup-head"><span class="lgl">People</span><span class="lgc">2 modules</span><span class="line"></span></div>
-              <div class="mgrid">
-                <div class="mcard" data-go="workforce" data-ph="later" data-name="workforce employees skills attendance" style="--a:var(--teal)">
-                  <div class="mc-top"><span class="mc-ic"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg></span></div>
-                  <h4>Workforce Management</h4><p>Availability, skills, attendance, productivity</p>
-                  <div class="mc-foot"><span class="ph ph-later">Roadmap</span><span class="mc-open">Open →</span></div>
-                </div>
-                <div class="mcard" data-go="payroll" data-ph="now" data-name="payroll time tracking timesheets bonuses" style="--a:var(--green)">
-                  <div class="mc-top"><span class="mc-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><span class="mc-rank">P2</span></div>
-                  <h4>Payroll &amp; Time Tracking</h4><p>Dual pay regime, material hours, bonuses as cost</p>
-                  <div class="mc-foot"><span class="ph ph-now">Live now</span><span class="mc-open">Open →</span></div>
-                </div>
-              </div>
-            </div>
-
-            <!-- FINANCE -->
-            <div class="lgroup" data-layer="finance">
-              <div class="lgroup-head"><span class="lgl">Finance</span><span class="lgc">2 modules</span><span class="line"></span></div>
-              <div class="mgrid">
-                <div class="mcard" data-go="finance" data-ph="now" data-name="finance accounting invoicing receivables raise" style="--a:var(--green)">
-                  <div class="mc-top"><span class="mc-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M14.5 9.5a2.5 2 0 0 0-2.5-1.5c-1.4 0-2.5.7-2.5 1.8s1.1 1.5 2.5 1.9 2.5.8 2.5 1.9-1.1 1.8-2.5 1.8a2.5 2 0 0 1-2.5-1.5"/></svg></span><span class="mc-rank">P1</span></div>
-                  <h4>Finance &amp; Accounting</h4><p>Invoicing, receivables, the raise decision</p>
-                  <div class="mc-foot"><span class="ph ph-now">Live now</span><span class="mc-open">Open →</span></div>
-                </div>
-                <div class="mcard" data-go="bi" data-ph="now" data-name="business intelligence reporting revenue margin" style="--a:var(--blue)">
-                  <div class="mc-top"><span class="mc-ic"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6"/><rect x="12" y="8" width="3" height="10"/><rect x="17" y="4" width="3" height="14"/></svg></span><span class="mc-rank">P3</span></div>
-                  <h4>Business Intelligence</h4><p>The six reporting screens · revenue &amp; margin</p>
-                  <div class="mc-foot"><span class="ph ph-now">Live now</span><span class="mc-open">Open →</span></div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="no-hit" id="noHit">No module matches your search.</div>
-        </div>
-      </section>
 
       <!-- ========================================================= DASHBOARD -->
       <section class="view active" id="view-dashboard">
@@ -1601,21 +1528,26 @@ h1,h2,h3,h4{font-family:"Sora",system-ui,sans-serif; color:var(--ink); line-heig
   var app = document.querySelector('.app');
   collapseBtn.addEventListener('click', function(){ app.classList.toggle('rail'); });
 
-  // ---- module search + phase filter ----
+  // ---- layer menu (level 1) + module search/phase (level 2) ----
   var modSearch = document.getElementById('modSearch');
   var phaseFilter = document.getElementById('phaseFilter');
+  var layerMenu = document.getElementById('layerMenu');
   var noHit = document.getElementById('noHit');
   var curPhase = 'all';
+  var curLayer = 'operations';   // default selected layer
 
   function filterMods(){
     var q = (modSearch.value || '').toLowerCase().trim();
+    var searching = q.length > 0;
     var anyHit = false;
-    document.querySelectorAll('.lgroup').forEach(function(g){
+    document.querySelectorAll('#modResults .lgroup').forEach(function(g){
+      // when searching, look across ALL layers; otherwise only the chosen layer
+      var layerOK = searching || g.getAttribute('data-layer') === curLayer;
       var groupHit = false;
       g.querySelectorAll('.mcard').forEach(function(c){
         var okText = !q || (c.getAttribute('data-name')+' '+c.querySelector('h4').textContent).toLowerCase().indexOf(q) > -1;
         var okPhase = curPhase==='all' || c.getAttribute('data-ph')===curPhase;
-        var show = okText && okPhase;
+        var show = layerOK && okText && okPhase;
         c.classList.toggle('hide', !show);
         if(show){ groupHit = true; anyHit = true; }
       });
@@ -1623,6 +1555,18 @@ h1,h2,h3,h4{font-family:"Sora",system-ui,sans-serif; color:var(--ink); line-heig
     });
     noHit.style.display = anyHit ? 'none' : 'block';
   }
+
+  // level 1: pick a layer → opens its sub-menu (modules)
+  layerMenu.querySelectorAll('.layer-card').forEach(function(card){
+    card.addEventListener('click', function(){
+      layerMenu.querySelectorAll('.layer-card').forEach(function(x){x.classList.remove('active');});
+      card.classList.add('active');
+      curLayer = card.getAttribute('data-layer');
+      modSearch.value = '';            // clear any search when switching layer
+      filterMods();
+    });
+  });
+
   modSearch.addEventListener('input', filterMods);
   phaseFilter.querySelectorAll('.fpill').forEach(function(p){
     p.addEventListener('click', function(){
@@ -1632,6 +1576,8 @@ h1,h2,h3,h4{font-family:"Sora",system-ui,sans-serif; color:var(--ink); line-heig
       filterMods();
     });
   });
+
+  filterMods();   // initial render → shows only the default layer
 
   // ---- payroll sub-tabs ----
   var payseg = document.getElementById('payseg');
